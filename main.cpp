@@ -22,6 +22,7 @@ void initialize() {
 	light.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
 	light.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
 	loop.createLoop();
+	cannon.setSpheres(3);
 }
 
 void idle() {
