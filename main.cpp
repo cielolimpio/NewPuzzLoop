@@ -5,13 +5,10 @@
 #include "Light.h"
 #include "Cannon.h"
 
-//enum Keyboard { NONE = -1, LEFT = 0, RIGHT, UP, DOWN };
-
-//Keyboard keyborad = NONE;
-
 Loop loop;
 Light light(boundaryX, boundaryY, boundaryX / 2, GL_LIGHT0);
 Cannon cannon;
+Sphere sphere;
 
 
 clock_t start_t = clock();
@@ -33,10 +30,7 @@ void idle() {
 		loop.checkStatus();
 		loop.moveSphere();
 		loop.addSphere(3);
-		//cannon.rotate(keyborad);
-		cannon.launchSpheres(cannon.stateOfLaunch, 3);
 		
-
 		start_t = end_t;
 	}
 
@@ -47,8 +41,9 @@ void keyboardDown(unsigned char key, int x, int y) {
 	switch (key)
 	{
 	case ' ':
-		cannon.setStateOfLanch(true);
-
+		if (cannon.isPossible()) {
+			sphere = cannon.launchSpheres();
+		}
 		break;
 		
 	default:

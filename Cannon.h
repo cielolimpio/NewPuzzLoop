@@ -17,14 +17,14 @@ public:
 	void setAngle(float ang);
 	float getAngle();
 	Vector3f getDirection();
-	void launchSpheres(bool state, int numOfColor);
-	void setStateOfLanch(bool state);
-
-	bool stateOfLaunch;
+	Sphere launchSpheres();
+	void setState(bool state);
+	bool isPossibleToLaunch();
 
 
 private:
-	//texture or material
+	bool isPossible;
+
 	vector <Sphere> cannonBall;
 	Vector3f direction;
 	float angle;
