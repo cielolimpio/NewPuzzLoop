@@ -24,6 +24,8 @@ void idle() {
 	if ((float)(end_t - start_t) > 1000 / 60.0f) {
 		loop.moveSphere();
 		loop.addSphere();
+
+		start_t = end_t;
 	}
 
 	glutPostRedisplay();

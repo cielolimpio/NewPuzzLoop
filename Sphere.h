@@ -1,6 +1,5 @@
 #pragma once
 #include "Shape3D.h"
-#include <GL/glut.h>
 
 
 class Sphere : public Shape3D {

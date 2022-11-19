@@ -3,8 +3,8 @@
 #include <vector>
 using namespace std;
 
-#include "Sphere.h"
 #include "Constants.h"
+#include "Sphere.h"
 
 class Loop
 {

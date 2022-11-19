@@ -1,7 +1,7 @@
 #pragma once
-#include "Sphere.h"
 #include <cmath>
 #include <vector>
+#include "Sphere.h"
 #include <GL/glut.h>
 
 using namespace std;
