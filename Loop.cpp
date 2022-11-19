@@ -1,4 +1,5 @@
 #include "Loop.h"
+#include <ctime>
 
 Loop::Loop() {
 	loopPoints.clear();
@@ -8,44 +9,24 @@ Loop::Loop() {
 	maxNumOfSpheres = 5;
 }
 
-void Loop::addSphere() {
-	/* Implement */
-	// Add a  sphere
-	// (1) when cntOfSpheres < maxNumOfSpheres
-	// (2) when the last sphere is at start loop point
+void Loop::addSphere(int numOfColor) {
 	if (sphereString.size() < maxNumOfSpheres) {
-		if (sphereString.empty()){
-			Sphere sphere(50, 30, 30);
-			Material mtl;
-			mtl.setEmission(0.1f, 0.1f, 0.1f, 1.0f);
-			mtl.setAmbient(0.3f, 0.1f, 0.1f, 1.0f);
-			mtl.setDiffuse(0.5f, 0.5f, 0.5f, 1.0f);
-			mtl.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
-			mtl.setShininess(50.0f);
-			sphere.setMTL(mtl);
-			sphere.setLoopPointIdx(0);
-			sphere.setCenter(loopPoints[0]);
-			sphereString.push_back(sphere);
-		}
-		else if (sphereString.back().getLoopPointIdx() == startLoopPointIdx) {
-			Sphere sphere(50, 30, 30);
-			Material mtl;
-			mtl.setEmission(0.1f, 0.1f, 0.1f, 1.0f);
-			mtl.setAmbient(0.3f, 0.1f, 0.1f, 1.0f);
-			mtl.setDiffuse(0.5f, 0.5f, 0.5f, 1.0f);
-			mtl.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
-			mtl.setShininess(50.0f);
-			sphere.setMTL(mtl);
+		srand((unsigned int)time(NULL));
+		int colorNum = (int)rand() % numOfColor;
+
+		if (sphereString.empty() || sphereString.back().getLoopPointIdx() == startLoopPointIdx){
+			printf("%d", colorNum);
+			Sphere sphere(25, 30, 30);
+			sphere.setColor(getColor(colorNum));
 			sphere.setLoopPointIdx(0);
 			sphere.setCenter(loopPoints[0]);
 			sphereString.push_back(sphere);
 		}
 	}
-
 }
 
 void Loop::createLoop() {
-	float radius = 50.0f;
+	float radius = 25.0f;
 
 	// create loop points
 	// start loop
@@ -61,7 +42,7 @@ void Loop::createLoop() {
 		loopPoints.push_back(Vector3f(i, 0.0f, 0.0f));
 
 	// set sphere
-	addSphere();
+	addSphere(3);
 }
 
 void Loop::moveSphere() {
