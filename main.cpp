@@ -28,7 +28,8 @@ void idle() {
 	end_t = clock();
 
 
-	if ((float)(end_t - start_t) > 1000 / 60.0f) {
+	if ((float)(end_t - start_t) > 1000 / 300.0f) {
+		loop.checkStatus();
 		loop.moveSphere();
 		loop.addSphere(3);
 		//cannon.rotate(keyborad);
@@ -127,7 +128,7 @@ int main(int argc, char** argv) {
 	// init GLUT and create Window
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-	glutInitWindowPosition(650, 300);
+	glutInitWindowPosition(250, 70);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutCreateWindow("Move spheres along the loop");
 	initialize();
