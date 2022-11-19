@@ -7,9 +7,9 @@ Cannon::Cannon() {
 	pos[0] =  -150.0f;
 	pos[1] =  0.0f;
 	pos[2] = 0.0f;
-	posOfSphere1 = pos;
-	posOfSphere2 = { posOfSphere1[0], posOfSphere1[1]+50, posOfSphere1[2] };
-
+	posOfSphere2 = pos;
+	posOfSphere1 = { posOfSphere2[0], posOfSphere2[1]+50, posOfSphere2[2] };
+	stateOfLaunch = false;
 
 }
 
@@ -18,9 +18,10 @@ void Cannon::setAngle(float ang) {
 	angle = ang;
 	direction[0] = cos(angle * 3.141592 / 180);
 	direction[1] = sin(angle * 3.141592 / 180);
+	cannonBall[0].setVelocity(direction);
 }
 
-float* Cannon::getDirection() {
+Vector3f Cannon::getDirection() {
 	return direction;
 }
 
@@ -46,10 +47,47 @@ void Cannon::setSpheres(int numOfColor) {
 	sphere2.setColor(color2);
 	sphere2.setCenter(posOfSphere2);
 	cannonBall.push_back(sphere2);
+
+	Vector3f di = { direction[1], direction[0], direction[2] };
+	cannonBall[0].setVelocity(di);
 	
-
-
 }
+
+void Cannon::setStateOfLanch(bool state) {
+	stateOfLaunch = state;
+}
+
+void Cannon::launchSpheres( bool state, int numOfColor) {
+	//int a = 0;
+
+		/*
+		if (a == 0) {
+			cannonBall[0] = cannonBall[1];
+
+			//setting new sphere
+			int colorNum2 = (int)rand() % numOfColor;
+			COLOR color2 = toColor(colorNum2);
+
+			Sphere sphere2(25, 30, 30);
+			sphere2.setColor(color2);
+			sphere2.setCenter(posOfSphere2);
+			cannonBall.push_back(sphere2);
+		}
+		*/
+		if (state)
+		cannonBall[0].move();
+	
+		//if (a == 100) {
+		//	setStateOfLanch(false);
+		//}
+		//a++;
+
+	
+	
+}
+
+
+
 
 void Cannon::draw() {
 	

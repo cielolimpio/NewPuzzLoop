@@ -34,11 +34,26 @@ void idle() {
 		loop.moveSphere();
 		loop.addSphere(3);
 		//cannon.rotate(keyborad);
+		cannon.launchSpheres(cannon.stateOfLaunch, 3);
+		
 
 		start_t = end_t;
 	}
 
 	glutPostRedisplay();
+}
+
+void keyboardDown(unsigned char key, int x, int y) {
+	switch (key)
+	{
+	case ' ':
+		cannon.setStateOfLanch(true);
+
+		break;
+		
+	default:
+		break;
+	}
 }
 
 void specialKeyDown(int key, int x, int y) {
@@ -136,6 +151,7 @@ int main(int argc, char** argv) {
 
 	// register callbacks
 	glutDisplayFunc(display);
+	glutKeyboardFunc(keyboardDown);
 	glutSpecialFunc(specialKeyDown);
 	glutIdleFunc(idle);
 
