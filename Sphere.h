@@ -19,6 +19,8 @@ public:
 
 	
 private:
+	COLOR color;
+
 	float radius;
 	int slice;
 	int stack;

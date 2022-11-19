@@ -35,14 +35,19 @@ void Shape3D::setColor(COLOR color) {
 	switch (color) {
 	case COLOR::YELLOW:
 		mtl.setAmbient(0.4f, 0.4f, 0.1f, 1.0f);
+		this->color = COLOR::YELLOW;
 		break;
 	case COLOR::BLUE:
 		mtl.setAmbient(0.1f, 0.4f, 0.4f, 1.0f);
+		this->color = COLOR::BLUE;
 		break;
 	case COLOR::PURPLE:
 		mtl.setAmbient(0.4f, 0.1f, 0.4f, 1.0f);
+		this->color = COLOR::PURPLE;
+		break;
 	}
 }
+COLOR Shape3D::getColor() const { return this->color; }
 
 void Shape3D::move() {
 	center[0] = center[0] + velocity[0];
