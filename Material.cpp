@@ -1,53 +1,39 @@
-#include "Material.h"
+#include"Material.h"
 
-Material::Material() {
-	setEmission(0.0f, 0.2f, 0.2f, 1.0f);
-	setAmbient(0.05f, 0.1f, 0.0f, 1.0f);
-	setDiffuse(0.5f, 0.5f, 0.1f, 1.0f);
-	setSpecular(0.5f, 0.5f, 0.0f, 1.0f);
-	setShininess(32.0f);
+Material::Material() : emission{}, ambient{}, diffuse{}, specular{} {
 }
 
 void Material::setEmission(float r, float g, float b, float a) {
-	this->emission[0] = r;
-	this->emission[1] = g;
-	this->emission[2] = b;
-	this->emission[3] = a;
-}
-void Material::setAmbient(float r, float g, float b, float a) {
-	this->ambient[0] = r;
-	this->ambient[1] = g;
-	this->ambient[2] = b;
-	this->ambient[3] = a;
-}
-void Material::setDiffuse(float r, float g, float b, float a) {
-	this->diffuse[0] = r;
-	this->diffuse[1] = g;
-	this->diffuse[2] = b;
-	this->diffuse[3] = a;
-}
-void Material::setSpecular(float r, float g, float b, float a) {
-	this->specular[0] = r;
-	this->specular[1] = g;
-	this->specular[2] = b;
-	this->specular[3] = a;
-}
-void Material::setShininess(float sh) {
-	this->shininess[0] = sh;
+	emission[0] = r;
+	emission[1] = g;
+	emission[2] = b;
+	emission[3] = a;
 }
 
-const float* Material::getEmission() const {
-	return this->emission;
+void Material::setAmbient(float r, float g, float b, float a) {
+	ambient[0] = r;
+	ambient[1] = g;
+	ambient[2] = b;
+	ambient[3] = a;
 }
-const float* Material::getAmbient() const {
-	return this->ambient;
+void Material::setDiffuse(float r, float g, float b, float a) {
+	diffuse[0] = r;
+	diffuse[1] = g;
+	diffuse[2] = b;
+	diffuse[3] = a;
 }
-const float* Material::getDiffuse() const {
-	return this->diffuse;
+void Material::setSpecular(float r, float g, float b, float a) {
+	specular[0] = r;
+	specular[1] = g;
+	specular[2] = b;
+	specular[3] = a;
 }
-const float* Material::getSpecular() const {
-	return this->specular;
+void Material::setShininess(float sh) {
+	shininess = sh;
 }
-const float* Material::getShininess() const {
-	return this->shininess;
-}
+
+Vector4f Material::getEmission() const { return emission; }
+Vector4f Material::getAmbient() const { return ambient; }
+Vector4f Material::getDiffuse() const { return diffuse; }
+Vector4f Material::getSpecular() const { return specular; }
+float Material::getShininess() const { return shininess; }

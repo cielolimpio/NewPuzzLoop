@@ -1,8 +1,11 @@
 #pragma once
-#include "Material.h"
+#include "Shape3D.h"
+#include <GL/glut.h>
 
-class Sphere {
+
+class Sphere : public Shape3D {
 public:
+	Sphere(){}
 	Sphere(float r, int sl, int st);
 
 	void setRadius(float r);
@@ -10,27 +13,17 @@ public:
 	void setSlice(int sl);
 	void setStack(int st);
 
-	void setCenter(float x, float y, float z);
-	float getCenterX() const;
-	float getCenterY() const;
-	float getCenterZ() const;
+	void setLoopPointIdx(int idx);
+	int getLoopPointIdx() const;
 
-	void setVelocity(float x, float y, float z);
-	float getVelocityX() const;
-	float getVelocityY() const;
-	float getVelocityZ() const;
+	virtual void draw() const;
 
-	void move();
-	void setMTL(const Material& m);
-
-	void draw() const;
-
+	
 private:
 	float radius;
 	int slice;
 	int stack;
 
-	float center[3];
-	float velocity[3];
-	Material mtl;
+	int loopPointIdx;
 };
+

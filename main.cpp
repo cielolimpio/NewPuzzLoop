@@ -1,121 +1,34 @@
 #include <iostream>
-#include <vector>
+#include <string>
 
-#include "Sphere.h"
+#include "Loop.h"
 #include "Light.h"
-#include "Cannon.h"
-#include "GL/glut.h"
 
-
-using namespace std;
-
-#define WINDOW_X 200
-#define WINDOW_Y 200
-
-#define WINDOW_WIDTH 640		// window's width
-#define WINDOW_HEIGHT 640		// window's height
-
-#define boundaryX (WINDOW_WIDTH)/2
-#define boundaryY (WINDOW_HEIGHT)/2
-
-enum Keyboard { NONE=-1, LEFT=0, RIGHT, UP, DOWN };
-
-Keyboard keyborad;
-vector<Sphere> spheres;
+Loop loop;
 Light light(boundaryX, boundaryY, boundaryX / 2, GL_LIGHT0);
-Cannon cannon;
 
+clock_t start_t = clock();
+clock_t end_t;
 
 void initialize() {
 	light.setAmbient(0.5f, 0.5f, 0.5f, 1.0f);
 	light.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
 	light.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
-
-	Material mtl1;
-	mtl1.setEmission(0.1f, 0.1f, 0.1f, 1.0f);
-	mtl1.setAmbient(0.4f, 0.4f, 0.1f, 1.0f);
-	mtl1.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
-	mtl1.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
-	mtl1.setShininess(10.0f);
-
-	Material mtl2(mtl1), mtl3(mtl1);
-	mtl2.setAmbient(0.1f, 0.4f, 0.4f, 1.0f);
-	mtl3.setAmbient(0.4f, 0.1f, 0.4f, 1.0f);
-
-	Sphere sphere1(50, 20, 20);
-	sphere1.setCenter(0.0f, -200.0f, 0.0f);
-	sphere1.setVelocity(0.02f, 0.06f, 0.0f);
-	sphere1.setMTL(mtl1);
-	spheres.push_back(sphere1);
-
-	Sphere sphere2(sphere1);
-	sphere2.setCenter(100.0f, 200.0f, 0.0f);
-	sphere2.setVelocity(-0.06f, -0.05f, 0.0f);
-	sphere2.setMTL(mtl2);
-	spheres.push_back(sphere2);
-
-	Sphere sphere3(sphere1);
-	sphere3.setCenter(-100.0f, 0.0f, 0.0f);
-	sphere3.setVelocity(-0.2f, 0.2f, 0.0f);
-	sphere3.setMTL(mtl3);
-	spheres.push_back(sphere3);
-
-}
-
-bool isCollisionDetected(const Sphere& sph1, const Sphere& sph2) {
-	float distanceX = sph1.getCenterX() - sph2.getCenterX();
-	float distanceY = sph1.getCenterY() - sph2.getCenterY();
-	return sqrt(pow(distanceX, 2.0f) + pow(distanceY, 2.0f)) <= sph1.getRadius() + sph2.getRadius();
-}
-
-void handleCollision(Sphere& sph1, Sphere& sph2) {
-	if (isCollisionDetected(sph1, sph2)) {
-		float distanceX = sph1.getCenterX() - sph2.getCenterX();
-		float distanceY = sph1.getCenterY() - sph2.getCenterY();
-		float d = pow(distanceX, 2.0f) + pow(distanceY, 2.0f);
-		float nx = distanceX / d;
-		float ny = distanceY / d;
-		float p = sph1.getCenterX() * nx + sph1.getCenterY() * ny - sph2.getCenterX() * nx - sph2.getCenterY() * ny;
-		float vx1 = sph1.getVelocityX() + p * nx;
-		float vy1 = sph1.getVelocityY() + p * ny;
-		float vx2 = sph2.getVelocityX() - p * nx;
-		float vy2 = sph2.getVelocityY() - p * ny;
-
-		sph1.setVelocity(vx1, vy1, sph1.getVelocityZ());
-		sph2.setVelocity(vx2, vy2, sph2.getVelocityZ());
-	}
+	loop.createLoop();
 }
 
 void idle() {
-	for (int i = 0; i < spheres.size(); i++) {
-		for (int j = i + 1; j < spheres.size(); j++) {
-			handleCollision(spheres[i], spheres[j]);
-		}
-	}
+	end_t = clock();
 
-	for (int i = 0; i < spheres.size(); i++) {
-		float radius = spheres[i].getRadius();
-		const float centerX = spheres[i].getCenterX();
-		const float centerY = spheres[i].getCenterY();
-		if (centerX + radius >= boundaryX || centerX - radius <= -boundaryX)
-			spheres[i].setVelocity(-spheres[i].getVelocityX(), spheres[i].getVelocityY(), spheres[i].getVelocityZ());
-		if (centerY + radius >= boundaryY || centerY - radius <= -boundaryY)
-			spheres[i].setVelocity(spheres[i].getVelocityX(), -spheres[i].getVelocityY(), spheres[i].getVelocityZ());
-		spheres[i].move();
-		glutPostRedisplay();
-	}
 
-	cannon.rotate(keyborad);
+	if ((float)(end_t - start_t) > 1000 / 60.0f) {
+		loop.moveSphere();
+		loop.addSphere();
+	}
 
 	glutPostRedisplay();
 }
 
-
-void displayCharacters(void* font, string str, float x, float y) {
-	glRasterPos2f(x, y);
-	for (int i = 0; i < str.size(); i++)
-		glutBitmapCharacter(font, str[i]);
-}
 void display() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -127,103 +40,33 @@ void display() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	// Draw 3D
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
+	glEnable(light.getLightID());
 	light.draw();
 
-	for (int i = 0; i < spheres.size(); i++) {
-		switch (i) {
-		case 0:
-			glColor3f(1.0f, 0.0f, 0.0f);
-			break;
-		case 1:
-			glColor3f(0.0f, 1.0f, 0.0f);
-			break;
-		case 2:
-			glColor3f(0.0f, 0.0f, 1.0f);
-			break;
-		default:
-			glColor3f(0.5f, 0.5f, 0.5f);
-			break;
-		}
-		spheres[i].draw();
-	}
+	loop.draw();
 
-	cannon.draw();
-
-	//glPopMatrix();
-
-
-	glDisable(GL_LIGHT0);
-	glDisable(GL_LIGHTING);
+	//glDisable(light.getLightID());
+	//glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
 
 	glutSwapBuffers();
-}
-
-void specialKeyDown(int key, int x, int y) {
-	switch (key)
-	{
-	case GLUT_KEY_LEFT:
-		keyborad = LEFT;
-		break;
-
-	case GLUT_KEY_RIGHT:
-		keyborad = RIGHT;
-		break;
-
-	case GLUT_KEY_UP:
-		keyborad = UP;
-		break;
-
-	case GLUT_KEY_DOWN:
-		keyborad = DOWN;
-		break;
-	}
-}
-
-void specialKeyUp(int key, int x, int y) {
-	switch (key)
-	{
-	case GLUT_KEY_LEFT:
-		keyborad = NONE;
-		break;
-
-	case GLUT_KEY_RIGHT:
-		keyborad = NONE;
-		break;
-
-	case GLUT_KEY_UP:
-		keyborad = NONE;
-		break;
-
-	case GLUT_KEY_DOWN:
-		keyborad = NONE;
-		break;
-	}
-
 }
 
 int main(int argc, char** argv) {
 	// init GLUT and create Window
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-	glutInitWindowPosition(WINDOW_X, WINDOW_Y);
+	glutInitWindowPosition(650, 300);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-	glutCreateWindow("Draw three spheres");
+	glutCreateWindow("Move spheres along the loop");
 	initialize();
 
 	// register callbacks
-
-	glutSpecialFunc(specialKeyDown);
-	glutIdleFunc(idle);
 	glutDisplayFunc(display);
-	glutSpecialFunc(specialKeyUp);
-
-
-
-
-
+	glutIdleFunc(idle);
 
 	// enter GLUT event processing cycle
 	glutMainLoop();

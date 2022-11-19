@@ -1,67 +1,54 @@
-#include "Sphere.h"
-#include <GL/glut.h>
+#include"Sphere.h"
 
-Sphere::Sphere(float r, int sl, int st) {
-	setRadius(r);
-	setSlice(sl);
-	setStack(st);
+Sphere::Sphere(float r, int sl, int st) : radius{ r }, slice{ sl }, stack{ st }, loopPointIdx{ 0 }  {}
 
-	setMTL(Material());
+void Sphere::setRadius(float r){
+	radius = r;
 }
 
-void Sphere::setRadius(float r) {
-	this->radius = r;
-}
-float Sphere::getRadius() const {
-	return this->radius;
+float Sphere:: getRadius() const{
+	return radius;
 }
 
-void Sphere::setSlice(int sl) {
-	this->slice = sl;
-}
-void Sphere::setStack(int st) {
-	this->stack = st;
+void Sphere::setSlice(int sl){
+	slice = sl;
 }
 
-void Sphere::setCenter(float x, float y, float z) {
-	this->center[0] = x;
-	this->center[1] = y;
-	this->center[2] = z;
+void Sphere::setStack(int st){
+	stack = st;
 }
-float Sphere::getCenterX() const { return this->center[0]; }
-float Sphere::getCenterY() const { return this->center[1]; }
-float Sphere::getCenterZ() const { return this->center[2]; }
 
-void Sphere::setVelocity(float x, float y, float z) {
-	this->velocity[0] = x;
-	this->velocity[1] = y;
-	this->velocity[2] = z;
-}
-float Sphere::getVelocityX() const { return this->velocity[0]; }
-float Sphere::getVelocityY() const { return this->velocity[1]; }
-float Sphere::getVelocityZ() const { return this->velocity[2]; }
 
-void Sphere::move() {
-	for (int i = 0; i < 3; i++) {
-		center[i] += velocity[i];
-	}
+void Sphere::setLoopPointIdx(int idx) {
+	loopPointIdx = idx;
 }
-void Sphere::setMTL(const Material& m) {
-	this->mtl = m;
+
+int Sphere::getLoopPointIdx() const {
+	return loopPointIdx;
 }
 
 void Sphere::draw() const {
 	glPushMatrix();
 
+	glShadeModel(GL_SMOOTH);
+
+	float em[4] = { mtl.getEmission()[0], mtl.getEmission()[1], mtl.getEmission()[2], mtl.getEmission()[3]};
+	float am[4] = { mtl.getAmbient()[0], mtl.getAmbient()[1], mtl.getAmbient()[2], mtl.getAmbient()[3] };
+	float di[4] = { mtl.getDiffuse()[0], mtl.getDiffuse()[1], mtl.getDiffuse()[2], mtl.getDiffuse()[3] };
+	float sp[4] = { mtl.getSpecular()[0], mtl.getSpecular()[1], mtl.getSpecular()[2], mtl.getSpecular()[3] };
+	float sh[1] = { mtl.getShininess() };
+	glMaterialfv(GL_FRONT, GL_EMISSION, em);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, am);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, di);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, sp);
+	glMaterialfv(GL_FRONT, GL_SHININESS, sh);
+	
 	glTranslatef(center[0], center[1], center[2]);
 
 	glutSolidSphere(radius, slice, stack);
+	
 	glPopMatrix();
 
-	glShadeModel(GL_SMOOTH);
-	glMaterialfv(GL_FRONT, GL_EMISSION, mtl.getEmission());
-	glMaterialfv(GL_FRONT, GL_AMBIENT, mtl.getAmbient());
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mtl.getDiffuse());
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mtl.getSpecular());
-	glMaterialfv(GL_FRONT, GL_SHININESS, mtl.getShininess());
 }
+
+
