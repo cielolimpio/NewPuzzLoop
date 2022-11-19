@@ -3,9 +3,16 @@
 
 #include "Loop.h"
 #include "Light.h"
+#include "Cannon.h"
+
+//enum Keyboard { NONE = -1, LEFT = 0, RIGHT, UP, DOWN };
+
+//Keyboard keyborad = NONE;
 
 Loop loop;
 Light light(boundaryX, boundaryY, boundaryX / 2, GL_LIGHT0);
+Cannon cannon;
+
 
 clock_t start_t = clock();
 clock_t end_t;
@@ -24,11 +31,64 @@ void idle() {
 	if ((float)(end_t - start_t) > 1000 / 60.0f) {
 		loop.moveSphere();
 		loop.addSphere(3);
+		//cannon.rotate(keyborad);
 
 		start_t = end_t;
 	}
 
 	glutPostRedisplay();
+}
+
+void specialKeyDown(int key, int x, int y) {
+
+	switch (key) {
+	case GLUT_KEY_LEFT:
+		if (cannon.getDirection()[1] >= 0) {
+			float ang = cannon.getAngle() + 1;
+			cannon.setAngle(ang);
+		}
+		else if (cannon.getDirection()[1] < 0) {
+			float ang = cannon.getAngle() - 1;
+			cannon.setAngle(ang);
+		}
+		break;
+
+	case GLUT_KEY_RIGHT:
+		if (cannon.getDirection()[1] >= 0) {
+			float ang = cannon.getAngle() - 1;
+			cannon.setAngle(ang);
+		}
+		else if (cannon.getDirection()[1] < 0) {
+			float ang = cannon.getAngle() + 1;
+			cannon.setAngle(ang);
+		}
+		break;
+
+	case GLUT_KEY_UP:
+		if (cannon.getDirection()[0] >= 0) {
+			float ang = cannon.getAngle() + 1;
+			cannon.setAngle(ang);
+		}
+		else if (cannon.getDirection()[0] < 0) {
+			float ang = cannon.getAngle() - 1;
+			cannon.setAngle(ang);
+		}
+		break;
+
+	case GLUT_KEY_DOWN:
+		if (cannon.getDirection()[0] >= 0) {
+			float ang = cannon.getAngle() - 1;
+			cannon.setAngle(ang);
+		}
+		else if (cannon.getDirection()[0] < 0) {
+			float ang = cannon.getAngle() + 1;
+			cannon.setAngle(ang);
+		}
+		break;
+
+	default:
+		break;
+	}
 }
 
 void display() {
@@ -46,9 +106,15 @@ void display() {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(light.getLightID());
+
 	light.draw();
 
+	glPushMatrix();
 	loop.draw();
+	glPopMatrix();
+
+	cannon.draw();
+
 
 	//glDisable(light.getLightID());
 	//glDisable(GL_LIGHTING);
@@ -68,6 +134,7 @@ int main(int argc, char** argv) {
 
 	// register callbacks
 	glutDisplayFunc(display);
+	glutSpecialFunc(specialKeyDown);
 	glutIdleFunc(idle);
 
 	// enter GLUT event processing cycle
