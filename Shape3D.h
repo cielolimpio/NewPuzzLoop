@@ -4,8 +4,10 @@
 
 enum class COLOR { YELLOW, BLUE, PURPLE };
 
-static COLOR getColor(int colorNum) {
-	switch (colorNum) {
+static COLOR toColor(int colorNum) {
+	int n = colorNum % 3;
+
+	switch (n) {
 	case 0:
 		return COLOR::YELLOW;
 	case 1:
@@ -26,6 +28,7 @@ public:
 	void move();
 	void setMTL(const Material& m);
 	void setColor(COLOR color);
+	COLOR getColor() const;
 	virtual void draw() const = 0;
 
 protected:
