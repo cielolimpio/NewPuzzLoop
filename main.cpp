@@ -3,7 +3,9 @@
 
 #include "Sphere.h"
 #include "Light.h"
+#include "Cannon.h"
 #include "GL/glut.h"
+
 
 using namespace std;
 
@@ -16,9 +18,13 @@ using namespace std;
 #define boundaryX (WINDOW_WIDTH)/2
 #define boundaryY (WINDOW_HEIGHT)/2
 
+enum Keyboard { NONE=-1, LEFT=0, RIGHT, UP, DOWN };
 
+Keyboard keyborad;
 vector<Sphere> spheres;
 Light light(boundaryX, boundaryY, boundaryX / 2, GL_LIGHT0);
+Cannon cannon;
+
 
 void initialize() {
 	light.setAmbient(0.5f, 0.5f, 0.5f, 1.0f);
@@ -53,6 +59,7 @@ void initialize() {
 	sphere3.setVelocity(-0.2f, 0.2f, 0.0f);
 	sphere3.setMTL(mtl3);
 	spheres.push_back(sphere3);
+
 }
 
 bool isCollisionDetected(const Sphere& sph1, const Sphere& sph2) {
@@ -98,6 +105,8 @@ void idle() {
 		glutPostRedisplay();
 	}
 
+	cannon.rotate(keyborad);
+
 	glutPostRedisplay();
 }
 
@@ -139,12 +148,60 @@ void display() {
 		}
 		spheres[i].draw();
 	}
-	glPopMatrix();
+
+	cannon.draw();
+
+	//glPopMatrix();
+
+
 	glDisable(GL_LIGHT0);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
 
 	glutSwapBuffers();
+}
+
+void specialKeyDown(int key, int x, int y) {
+	switch (key)
+	{
+	case GLUT_KEY_LEFT:
+		keyborad = LEFT;
+		break;
+
+	case GLUT_KEY_RIGHT:
+		keyborad = RIGHT;
+		break;
+
+	case GLUT_KEY_UP:
+		keyborad = UP;
+		break;
+
+	case GLUT_KEY_DOWN:
+		keyborad = DOWN;
+		break;
+	}
+}
+
+void specialKeyUp(int key, int x, int y) {
+	switch (key)
+	{
+	case GLUT_KEY_LEFT:
+		keyborad = NONE;
+		break;
+
+	case GLUT_KEY_RIGHT:
+		keyborad = NONE;
+		break;
+
+	case GLUT_KEY_UP:
+		keyborad = NONE;
+		break;
+
+	case GLUT_KEY_DOWN:
+		keyborad = NONE;
+		break;
+	}
+
 }
 
 int main(int argc, char** argv) {
@@ -157,8 +214,16 @@ int main(int argc, char** argv) {
 	initialize();
 
 	// register callbacks
-	glutDisplayFunc(display);
+
+	glutSpecialFunc(specialKeyDown);
 	glutIdleFunc(idle);
+	glutDisplayFunc(display);
+	glutSpecialFunc(specialKeyUp);
+
+
+
+
+
 
 	// enter GLUT event processing cycle
 	glutMainLoop();
