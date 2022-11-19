@@ -16,15 +16,21 @@ public:
 	void draw();
 	void setAngle(float ang);
 	float getAngle();
-	float* getDirection();
+	Vector3f getDirection();
+	void launchSpheres(bool state, int numOfColor);
+	void setStateOfLanch(bool state);
+
+	bool stateOfLaunch;
+
 
 private:
 	//texture or material
 	vector <Sphere> cannonBall;
-	float direction[3];
+	Vector3f direction;
 	float angle;
 	Vector3f pos;
 	Vector3f posOfSphere1;
 	Vector3f posOfSphere2;
+
 
 };
