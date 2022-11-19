@@ -19,11 +19,11 @@ public:
 	Vector3f getDirection();
 	Sphere launchSpheres();
 	void setState(bool state);
-	bool isPossibleToLaunch();
+	bool isPossible();
 
 
 private:
-	bool isPossible;
+	bool isPossibleToLaunch;
 
 	vector <Sphere> cannonBall;
 	Vector3f direction;
