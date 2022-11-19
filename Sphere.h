@@ -12,6 +12,9 @@ public:
 	void setSlice(int sl);
 	void setStack(int st);
 
+	void setVelocityOfIdx(int v);
+	int getVelocityOfIdx();
+
 	void setLoopPointIdx(int idx);
 	int getLoopPointIdx() const;
 
@@ -19,11 +22,11 @@ public:
 
 	
 private:
-	COLOR color;
-
 	float radius;
 	int slice;
 	int stack;
+
+	int velocityOfIdx;
 
 	int loopPointIdx;
 };

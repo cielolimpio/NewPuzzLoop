@@ -1,4 +1,5 @@
 #include"Cannon.h"
+#include "Constants.h"
 
 Cannon::Cannon() {
 	angle = 0.0f;
@@ -43,7 +44,7 @@ void Cannon::setSpheres() {
 	sphere1.setCenter(posOfSphere1);
 	cannonBall.push_back(sphere1);
 
-	Vector3f di = { direction[1], direction[0], direction[2] };
+	Vector3f di = { direction[0], direction[1], direction[2] };
 	cannonBall[0].setVelocity(di);
 
 	Sphere sphere2(25, 30, 30);
@@ -66,10 +67,11 @@ Sphere Cannon::launchSpheres() {
 
 	Sphere sphere;
 	sphere = cannonBall[0];
+	sphere.setCenter(Vector3f(pos[0] + 50 * direction[0], pos[1] + 50 * direction[1], pos[2]));
 
 	cannonBall[0] = cannonBall[1];
 	cannonBall[0].setCenter(posOfSphere1);
-	Vector3f di = { direction[1], direction[0], direction[2] };
+	Vector3f di = { direction[0], direction[1], direction[2] };
 	cannonBall[0].setVelocity(di);
 
 	Sphere sphere2(25, 30, 30);
@@ -79,7 +81,8 @@ Sphere Cannon::launchSpheres() {
 
 	setState(false);
 
-
+	Vector3f currentVelocity = sphere.getVelocity();
+	sphere.setVelocity(Vector3f(currentVelocity[0] * cannonBallScale, currentVelocity[1] * cannonBallScale, currentVelocity[2] * cannonBallScale));
 	return sphere;
 
 }
@@ -89,20 +92,19 @@ void Cannon::draw() {
 	
 	glTranslatef(pos[0], pos[1], pos[2]);
 	glRotatef(angle-90, 0.0f, 0.0f, 1.0f);
-	glTranslatef(0, 50.0f, 0);
+	glTranslatef(-pos[0], -pos[1], -pos[2]);
 
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 
 	glBegin(GL_QUADS);
-	glVertex2f(-30.0f, -60.0f);
-	glVertex2f(30.0f, -60.0f);
-	glVertex2f(30.0f, 60.0f);
-	glVertex2f(-30.0f, 60.0f);
+	glVertex2f(-30.0f + pos[0], -60.0f + pos[1]);
+	glVertex2f(30.0f + pos[0], -60.0f + pos[1]);
+	glVertex2f(30.0f + pos[0], 60.0f + pos[1]);
+	glVertex2f(-30.0f + pos[0], 60.0f + pos[1]);
 	glEnd();
 	
 	glEnable(GL_LIGHTING);
-	glTranslatef(-pos[0], -pos[1], -pos[2]);
 	cannonBall[0].draw();
 	cannonBall[1].draw();
 	

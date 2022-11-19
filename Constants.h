@@ -10,3 +10,6 @@
 #define boundaryY (WINDOW_HEIGHT)/2
 
 #define emptySpace 300.0f
+
+#define cannonBallScale 4.0f
+#define angleScale 3.0f

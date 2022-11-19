@@ -6,26 +6,39 @@ using namespace std;
 #include "Constants.h"
 #include "Sphere.h"
 
+enum class LoopState { DEFAULT, INSERT, ERASE, VICTORY, GAME_OVER };
+
 class Loop
 {
 public:
 	Loop();
 
+	vector<Sphere> getSphereString();
+
 	void addSphere(int numOfColor);
 	void createLoop();
+
+	bool willEraseAgain();
+
+	LoopState handleCollision(COLOR color, int idx, int offset = 0);
+
+	bool isSphereInserted(Sphere& sphere);
+	bool isEraseComplete();
+
 	void moveSphere();
-	int checkStatus();
+	LoopState getState();
 
 	void draw() const;
 
 private:
-	int status; // 0: in game, 1: victory, -1: game over
+	LoopState state;
 
 	vector<Vector3f> loopPoints;
 	int startLoopPointIdx;
 	int endLoopPointIdx;
+	int handlingLoopPointIdx;
 
 	vector<Sphere> sphereString;
-	int maxNumOfSpheres;
+	int numOfSpheres;
 };
 

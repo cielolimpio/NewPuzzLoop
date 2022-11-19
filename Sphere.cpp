@@ -1,6 +1,6 @@
 #include"Sphere.h"
 
-Sphere::Sphere(float r, int sl, int st) : radius{ r }, slice{ sl }, stack{ st }, loopPointIdx{ 0 }  {}
+Sphere::Sphere(float r, int sl, int st) : radius{ r }, slice{ sl }, stack{ st }, loopPointIdx{ 0 }, velocityOfIdx{ 1 } {}
 
 void Sphere::setRadius(float r){
 	radius = r;
@@ -17,6 +17,11 @@ void Sphere::setSlice(int sl){
 void Sphere::setStack(int st){
 	stack = st;
 }
+
+void Sphere::setVelocityOfIdx(int v) {
+	velocityOfIdx = v;
+}
+int Sphere::getVelocityOfIdx() { return velocityOfIdx; }
 
 
 void Sphere::setLoopPointIdx(int idx) {

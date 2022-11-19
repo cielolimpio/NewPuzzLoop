@@ -9,7 +9,7 @@ Loop loop;
 Light light(boundaryX, boundaryY, boundaryX / 2, GL_LIGHT0);
 Cannon cannon;
 Sphere sphere;
-
+bool sphereExists = false;
 
 clock_t start_t = clock();
 clock_t end_t;
@@ -19,17 +19,70 @@ void initialize() {
 	light.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
 	light.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
 	loop.createLoop();
-	cannon.setSpheres(3);
+	cannon.setSpheres();
+}
+
+bool isCollisionDetected(const Sphere& sph1, const Sphere& sph2) {
+	float distanceX = sph1.getCenter()[0] - sph2.getCenter()[0];
+	float distanceY = sph1.getCenter()[1] - sph2.getCenter()[1];
+	return sqrt(pow(distanceX, 2.0f) + pow(distanceY, 2.0f)) <= sph1.getRadius() + sph2.getRadius();
+}
+
+void handleCollision(Sphere& sphere, vector<Sphere>& sphereString) {
+	for (int i = 0; i < sphereString.size(); i++) {
+		if (isCollisionDetected(sphere, sphereString[i])) {
+			if (loop.handleCollision(sphere.getColor(), i, 1) == LoopState::ERASE)
+				sphereExists = false;
+			return;
+		}
+	}
 }
 
 void idle() {
 	end_t = clock();
 
 
-	if ((float)(end_t - start_t) > 1000 / 300.0f) {
-		loop.checkStatus();
+	if ((float)(end_t - start_t) > 1000 / 40.0f) {
+		LoopState loopState = loop.getState();
+
+		switch (loopState) {
+		case LoopState::DEFAULT:
+		{
+			// handle collision between sphere and loop
+			vector<Sphere> sphereString = loop.getSphereString();
+			handleCollision(sphere, sphereString);
+
+			// when sphere goes out from window
+			float radius = sphere.getRadius();
+			const float centerX = sphere.getCenter()[0];
+			const float centerY = sphere.getCenter()[1];
+			if (centerX + radius <= -boundaryX || centerX - radius >= boundaryX ||
+				centerY + radius <= -boundaryY || centerY - radius >= boundaryY) {
+				cannon.setState(true);
+			}
+			break;
+		}
+		case LoopState::INSERT:
+		{
+			if (loop.isSphereInserted(sphere))
+				cannon.setState(true);
+			break;
+		}
+		case LoopState::ERASE:
+		{
+			if (loop.isEraseComplete())
+				cannon.setState(true);
+			break;
+		}
+		case LoopState::VICTORY:
+			// handle victory
+			return;
+		case LoopState::GAME_OVER:
+			// handle game_over
+			return;
+		}
+		sphere.move();
 		loop.moveSphere();
-		loop.addSphere(3);
 		
 		start_t = end_t;
 	}
@@ -43,6 +96,7 @@ void keyboardDown(unsigned char key, int x, int y) {
 	case ' ':
 		if (cannon.isPossible()) {
 			sphere = cannon.launchSpheres();
+			sphereExists = true;
 		}
 		break;
 		
@@ -56,44 +110,44 @@ void specialKeyDown(int key, int x, int y) {
 	switch (key) {
 	case GLUT_KEY_LEFT:
 		if (cannon.getDirection()[1] >= 0) {
-			float ang = cannon.getAngle() + 1;
+			float ang = cannon.getAngle() + angleScale;
 			cannon.setAngle(ang);
 		}
 		else if (cannon.getDirection()[1] < 0) {
-			float ang = cannon.getAngle() - 1;
+			float ang = cannon.getAngle() - angleScale;
 			cannon.setAngle(ang);
 		}
 		break;
 
 	case GLUT_KEY_RIGHT:
 		if (cannon.getDirection()[1] >= 0) {
-			float ang = cannon.getAngle() - 1;
+			float ang = cannon.getAngle() - angleScale;
 			cannon.setAngle(ang);
 		}
 		else if (cannon.getDirection()[1] < 0) {
-			float ang = cannon.getAngle() + 1;
+			float ang = cannon.getAngle() + angleScale;
 			cannon.setAngle(ang);
 		}
 		break;
 
 	case GLUT_KEY_UP:
 		if (cannon.getDirection()[0] >= 0) {
-			float ang = cannon.getAngle() + 1;
+			float ang = cannon.getAngle() + angleScale;
 			cannon.setAngle(ang);
 		}
 		else if (cannon.getDirection()[0] < 0) {
-			float ang = cannon.getAngle() - 1;
+			float ang = cannon.getAngle() - angleScale;
 			cannon.setAngle(ang);
 		}
 		break;
 
 	case GLUT_KEY_DOWN:
 		if (cannon.getDirection()[0] >= 0) {
-			float ang = cannon.getAngle() - 1;
+			float ang = cannon.getAngle() - angleScale;
 			cannon.setAngle(ang);
 		}
 		else if (cannon.getDirection()[0] < 0) {
-			float ang = cannon.getAngle() + 1;
+			float ang = cannon.getAngle() + angleScale;
 			cannon.setAngle(ang);
 		}
 		break;
@@ -121,10 +175,13 @@ void display() {
 
 	light.draw();
 
+	if (sphereExists)
+		sphere.draw();
+
 	glPushMatrix();
 	loop.draw();
 	glPopMatrix();
-
+	
 	cannon.draw();
 
 
