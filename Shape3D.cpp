@@ -27,6 +27,23 @@ void Shape3D::setMTL(const Material& m) {
 	mtl.setShininess(m.getShininess());
 }
 
+void Shape3D::setColor(COLOR color) {
+	mtl.setEmission(0.1f, 0.1f, 0.1f, 1.0f);
+	mtl.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
+	mtl.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
+	mtl.setShininess(10.0f);
+	switch (color) {
+	case COLOR::YELLOW:
+		mtl.setAmbient(0.4f, 0.4f, 0.1f, 1.0f);
+		break;
+	case COLOR::BLUE:
+		mtl.setAmbient(0.1f, 0.4f, 0.4f, 1.0f);
+		break;
+	case COLOR::PURPLE:
+		mtl.setAmbient(0.4f, 0.1f, 0.4f, 1.0f);
+	}
+}
+
 void Shape3D::move() {
 	center[0] = center[0] + velocity[0];
 	center[1] = center[1] + velocity[1];

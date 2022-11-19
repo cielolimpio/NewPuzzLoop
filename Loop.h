@@ -11,7 +11,7 @@ class Loop
 public:
 	Loop();
 
-	void addSphere();
+	void addSphere(int numOfColor);
 	void createLoop();
 	void moveSphere();
 
