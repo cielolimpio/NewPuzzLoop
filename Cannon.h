@@ -12,7 +12,8 @@ class Cannon {
 public:
 	Cannon();
 	//void rotate(int key);
-	void setSpheres(int numOfColor);
+	COLOR setSphereColor(int numOfColor);
+	void setSpheres();
 	void draw();
 	void setAngle(float ang);
 	float getAngle();

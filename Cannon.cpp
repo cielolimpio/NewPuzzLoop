@@ -9,7 +9,7 @@ Cannon::Cannon() {
 	pos[2] = 0.0f;
 	posOfSphere2 = pos;
 	posOfSphere1 = { posOfSphere2[0], posOfSphere2[1]+50, posOfSphere2[2] };
-	stateOfLaunch = false;
+	isPossibleToLaunch = true;
 }
 
 void Cannon::setAngle(float ang) {
@@ -28,27 +28,29 @@ float Cannon::getAngle() {
 	return angle;
 }
 
-void Cannon::setSpheres(int numOfColor) {
-	//setting two spheres
-	
-	int colorNum1 = (int)rand() % numOfColor;
-	COLOR color1 = toColor(colorNum1);
+COLOR Cannon::setSphereColor(int numOfColor) {
+	int colorNum = (int)rand() % numOfColor;
+	COLOR color = toColor(colorNum);
+	return color;
 
+}
+
+void Cannon::setSpheres() {
+	//setting two spheres
+		
 	Sphere sphere1(25, 30, 30);
-	sphere1.setColor(color1);
+	sphere1.setColor(setSphereColor(3));
 	sphere1.setCenter(posOfSphere1);
 	cannonBall.push_back(sphere1);
 
-	int colorNum2 = (int)rand() % numOfColor;
-	COLOR color2 = toColor(colorNum2);
+	Vector3f di = { direction[1], direction[0], direction[2] };
+	cannonBall[0].setVelocity(di);
 
 	Sphere sphere2(25, 30, 30);
-	sphere2.setColor(color2);
+	sphere2.setColor(setSphereColor(3));
 	sphere2.setCenter(posOfSphere2);
 	cannonBall.push_back(sphere2);
 
-	Vector3f di = { direction[1], direction[0], direction[2] };
-	cannonBall[0].setVelocity(di);
 	
 }
 
@@ -61,7 +63,25 @@ bool Cannon::isPossible() {
 }
 
 Sphere Cannon::launchSpheres() {
+
+	Sphere sphere;
+	sphere = cannonBall[0];
+
+	cannonBall[0] = cannonBall[1];
+	cannonBall[0].setCenter(posOfSphere1);
+	Vector3f di = { direction[1], direction[0], direction[2] };
+	cannonBall[0].setVelocity(di);
+
+	Sphere sphere2(25, 30, 30);
+	sphere2.setColor(setSphereColor(3));
+	sphere2.setCenter(posOfSphere2);
+	cannonBall[1] = sphere2;
+
 	setState(false);
+
+
+	return sphere;
+
 }
 
 
