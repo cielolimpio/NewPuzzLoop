@@ -41,13 +41,12 @@ void handleCollision(Sphere& sphere, vector<Sphere>& sphereString) {
 void idle() {
 	end_t = clock();
 
+	LoopState loopState = loop.getState();
 
-	if ((float)(end_t - start_t) > 1000 / 40.0f) {
-		LoopState loopState = loop.getState();
-
-		switch (loopState) {
-		case LoopState::DEFAULT:
-		{
+	switch (loopState) {
+	case LoopState::DEFAULT:
+	{
+		if ((float)(end_t - start_t) > 1000 / 40.0f) {
 			// handle collision between sphere and loop
 			vector<Sphere> sphereString = loop.getSphereString();
 			handleCollision(sphere, sphereString);
@@ -60,31 +59,45 @@ void idle() {
 				centerY + radius <= -boundaryY || centerY - radius >= boundaryY) {
 				cannon.setState(true);
 			}
-			break;
+
+			sphere.move();
+			loop.moveSphere();
+
+			start_t = end_t;
 		}
-		case LoopState::INSERT:
-		{
+		break;
+	}
+	case LoopState::INSERT:
+	{
+		if ((float)(end_t - start_t) > 1000 / 100.0f) {
 			if (loop.isSphereInserted(sphere))
 				cannon.setState(true);
-			break;
+
+			sphere.move();
+			loop.moveSphere();
+
+			start_t = end_t;
 		}
-		case LoopState::ERASE:
-		{
+		break;
+	}
+	case LoopState::ERASE:
+	{
+		if ((float)(end_t - start_t) > 1000 / 100.0f) {
 			if (loop.isEraseComplete())
 				cannon.setState(true);
-			break;
+			sphere.move();
+			loop.moveSphere();
+
+			start_t = end_t;
 		}
-		case LoopState::VICTORY:
-			// handle victory
-			return;
-		case LoopState::GAME_OVER:
-			// handle game_over
-			return;
-		}
-		sphere.move();
-		loop.moveSphere();
-		
-		start_t = end_t;
+		break;
+	}
+	case LoopState::VICTORY:
+		// handle victory
+		return;
+	case LoopState::GAME_OVER:
+		// handle game_over
+		return;
 	}
 
 	glutPostRedisplay();
