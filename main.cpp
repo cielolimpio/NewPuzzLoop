@@ -44,6 +44,18 @@ void idle() {
 	LoopState loopState = loop.getState();
 
 	switch (loopState) {
+	case LoopState::START: {
+		if ((float)(end_t - start_t) > 1000 / 250.0f) {
+			if (loop.finishStarting()) {
+				cannon.setState(true);
+			}
+			else {
+				sphereExists = false;
+				cannon.setState(false);
+				loop.moveSphere();
+			}
+		}
+	}
 	case LoopState::DEFAULT:
 	{
 		if ((float)(end_t - start_t) > 1000 / 40.0f) {
@@ -74,8 +86,12 @@ void idle() {
 	{
 		if ((float)(end_t - start_t) > 1000 / 180.0f) {
 			if (loop.isSphereInserted(sphere)) {
+				if (loop.getState() == LoopState::ERASE) {
+					cannon.setState(false);
+				}
+				else {cannon.setState(true);}
+				
 				sphereExists = false;
-				cannon.setState(true);
 			}
 				
 			sphere.move();
@@ -113,6 +129,7 @@ void keyboardDown(unsigned char key, int x, int y) {
 	{
 	case ' ':
 		if (cannon.isPossible()) {
+			cannon.setState(false);
 			sphere = cannon.launchSpheres();
 			sphereExists = true;
 		}

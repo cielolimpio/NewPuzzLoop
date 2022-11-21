@@ -10,7 +10,7 @@ Cannon::Cannon() {
 	pos[2] = 0.0f;
 	posOfSphere2 = pos;
 	posOfSphere1 = { posOfSphere2[0], posOfSphere2[1]+50, posOfSphere2[2] };
-	isPossibleToLaunch = true;
+	isPossibleToLaunch = false;
 }
 
 void Cannon::setAngle(float ang) {

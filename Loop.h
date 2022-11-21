@@ -6,7 +6,7 @@ using namespace std;
 #include "Constants.h"
 #include "Sphere.h"
 
-enum class LoopState { DEFAULT, INSERT, ERASE, VICTORY, GAME_OVER };
+enum class LoopState { DEFAULT, START, INSERT, ERASE, VICTORY, GAME_OVER };
 
 class Loop
 {
@@ -17,6 +17,8 @@ public:
 
 	void addSphere(int numOfColor);
 	void createLoop();
+
+	bool finishStarting();
 
 	bool checkErase(Sphere& sphere, int idx);
 	bool willEraseAgain();

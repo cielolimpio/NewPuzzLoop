@@ -8,7 +8,7 @@ Loop::Loop() {
 	sphereString.clear();
 	numOfSpheres = 20;
 
-	state = LoopState::DEFAULT;
+	state = LoopState::START;
 }
 
 vector<Sphere> Loop::getSphereString() {
@@ -19,7 +19,7 @@ void Loop::addSphere(int numOfColor) {
 	if (numOfSpheres > 0) {
 		srand((unsigned int)time(NULL));
 		int colorNum = (int)rand() % numOfColor;
-		int n = 1;
+		int n = sphereString.size() + 1;
 		while (n >= 0) {
 			colorNum = (int)rand() % numOfColor;
 			n--;
@@ -56,12 +56,12 @@ void Loop::createLoop() {
 
 	// create loop points
 	// start loop
-	for (int i = -boundaryX - radius * 3; i < -boundaryX - radius; i++)
+	for (int i = -boundaryX - radius * 5; i < -boundaryX - radius * 3; i++)
 		loopPoints.push_back(Vector3f(i, height, 0.0f));
 	// sphere loop
 	startLoopPointIdx = loopPoints.size();
 
-	for (int i = -boundaryX - radius; i < -boundaryX + radius; i++)
+	for (int i = -boundaryX - radius * 3; i < -boundaryX + radius; i++)
 		loopPoints.push_back(Vector3f(i, height, 0.0f));
 
 	for (int i = -boundaryX + radius; i <= boundaryX - radius - emptySpace; i++)
@@ -80,6 +80,17 @@ void Loop::createLoop() {
 
 	// set sphere
 	addSphere(3);
+}
+
+bool Loop::finishStarting() {
+	if (sphereString.size() > 10) {
+		state = LoopState::DEFAULT;
+		return true;
+	}
+	else {
+		addSphere(3);
+		return false;
+	}
 }
 
 bool Loop::checkErase(Sphere& sphere, int idx) {
