@@ -18,9 +18,13 @@ public:
 	void addSphere(int numOfColor);
 	void createLoop();
 
+	bool checkErase(Sphere& sphere, int idx);
 	bool willEraseAgain();
+	void handleErase(int start, int end);
+	void handleInsert(Sphere& sphere, int idx);
 
-	LoopState handleCollision(COLOR color, int idx, int offset = 0);
+	LoopState handleCollision(Sphere& sphere, int idx);
+	LoopState handleCollision(COLOR color, int idx);
 
 	bool isSphereInserted(Sphere& sphere);
 	bool isEraseComplete();
@@ -36,7 +40,9 @@ private:
 	vector<Vector3f> loopPoints;
 	int startLoopPointIdx;
 	int endLoopPointIdx;
+
 	int handlingLoopPointIdx;
+	int loopPointIdxToCheckErasing;
 
 	vector<Sphere> sphereString;
 	int numOfSpheres;

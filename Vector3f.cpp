@@ -1,4 +1,5 @@
 #include "Vector3f.h"
+#include <cmath>
 
 Vector3f::Vector3f() {}
 Vector3f::Vector3f(float x, float y, float z) {
@@ -39,6 +40,16 @@ Vector3f operator/(const Vector3f& v, const float s) {
 	return Vector3f(v[0] / s, v[1] / s, v[2] / s);
 }
 
+bool operator==(const Vector3f& v1, const Vector3f& v2) {
+	return v1[0] == v2[0] && v1[1] == v2[1] && v1[2] == v2[2];
+}
+
 float dotProduct(const Vector3f& v1, const Vector3f& v2) {
 	return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
+}
+
+float getDistance(const Vector3f& v1, const Vector3f& v2) {
+	Vector3f vDifference = v1 - v2;
+	
+	return sqrt(pow(vDifference[0], 2) + pow(vDifference[1], 2) + pow(vDifference[2], 2));
 }

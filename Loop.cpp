@@ -56,10 +56,14 @@ void Loop::createLoop() {
 
 	// create loop points
 	// start loop
-	for (int i = -boundaryX - radius; i < -boundaryX + radius; i++)
+	for (int i = -boundaryX - radius * 3; i < -boundaryX - radius; i++)
 		loopPoints.push_back(Vector3f(i, height, 0.0f));
 	// sphere loop
 	startLoopPointIdx = loopPoints.size();
+
+	for (int i = -boundaryX - radius; i < -boundaryX + radius; i++)
+		loopPoints.push_back(Vector3f(i, height, 0.0f));
+
 	for (int i = -boundaryX + radius; i <= boundaryX - radius - emptySpace; i++)
 		loopPoints.push_back(Vector3f(i, height, 0.0f));
 
@@ -76,6 +80,35 @@ void Loop::createLoop() {
 
 	// set sphere
 	addSphere(3);
+}
+
+bool Loop::checkErase(Sphere& sphere, int idx) {
+	if (sphereString[idx].getColor() == sphere.getColor()) {
+		COLOR color = sphere.getColor();
+		int start = idx;
+		int end = idx;
+
+		if (sphereString[start].getColor() == color) {
+			while (start > 0) {
+				if (sphereString[start - 1].getColor() == color)
+					start--;
+				else break;
+			}
+		}
+		if (sphereString[end].getColor() == color) {
+			while (end < sphereString.size() - 1) {
+				if (sphereString[end + 1].getColor() == color)
+					end++;
+				else break;
+			}
+		}
+		if (end - start + 2 >= 3) {
+			// erase
+			handleErase(start, end);
+			return true;
+		}
+	}
+	return false;
 }
 
 bool Loop::willEraseAgain() {
@@ -102,7 +135,85 @@ bool Loop::willEraseAgain() {
 	else return false;
 }
 
-LoopState Loop::handleCollision(COLOR color, int idx, int offset) {
+void Loop::handleErase(int start, int end) {
+	sphereString.erase(sphereString.begin() + start, sphereString.begin() + end + 1);
+
+	if (sphereString.empty()) {
+		state = LoopState::VICTORY;
+		return;
+	}
+
+	handlingLoopPointIdx = start;
+	if (handlingLoopPointIdx != 0 && handlingLoopPointIdx != sphereString.size()) {
+		if (willEraseAgain()) {
+			for (int i = 0; i < handlingLoopPointIdx; i++) {
+				sphereString[i].setVelocityOfIdx(-1);
+			}
+			for (int i = handlingLoopPointIdx; i < sphereString.size(); i++) {
+				sphereString[i].setVelocityOfIdx(0);
+			}
+		}
+		else {
+			for (int i = 0; i < handlingLoopPointIdx; i++) {
+				sphereString[i].setVelocityOfIdx(0);
+			}
+			for (int i = handlingLoopPointIdx; i < sphereString.size(); i++) {
+				sphereString[i].setVelocityOfIdx(1);
+			}
+		}
+	}
+}
+
+void Loop::handleInsert(Sphere& sphere, int idx) {
+	// TODO : handling when collision with first sphere
+	float d1 = getDistance(sphere.getCenter(), sphereString[idx].getCenter());
+	float d2 = getDistance(sphere.getCenter(), loopPoints[sphereString[idx].getLoopPointIdx() - 1]);
+
+	if (d1 > d2) {
+		handlingLoopPointIdx = idx;
+		loopPointIdxToCheckErasing = idx + 1;
+	}
+	else if (idx != 0) {
+		handlingLoopPointIdx = idx - 1;
+		loopPointIdxToCheckErasing = idx - 1;
+	}
+	else {
+		// idx == 0
+		handlingLoopPointIdx = -1;
+		loopPointIdxToCheckErasing = -1;
+		for (int i = 0; i < sphereString.size(); i++) {
+			sphereString[i].setVelocityOfIdx(0);
+		}
+
+		Vector3f newVelocity = (loopPoints[sphereString[0].getLoopPointIdx() + 50] - sphere.getCenter()) / 50.0f;
+		sphere.setVelocity(newVelocity);
+		return;
+	}
+
+	for (int i = 0; i <= handlingLoopPointIdx; i++) {
+		sphereString[i].setVelocityOfIdx(1);
+	}
+	for (int i = handlingLoopPointIdx + 1; i < sphereString.size(); i++) {
+		sphereString[i].setVelocityOfIdx(0);
+	}
+
+	Vector3f newVelocity = (loopPoints[sphereString[handlingLoopPointIdx].getLoopPointIdx()] - sphere.getCenter()) / 50.0f;
+	sphere.setVelocity(newVelocity);
+}
+
+LoopState Loop::handleCollision(Sphere& sphere, int idx) {
+	if (checkErase(sphere, idx)) {
+		state = LoopState::ERASE;
+		return LoopState::ERASE;
+	}
+
+	// insert
+	state = LoopState::INSERT;
+	handleInsert(sphere, idx);
+	return LoopState::INSERT;
+}
+
+LoopState Loop::handleCollision(COLOR color, int idx) {
 	if (sphereString[idx].getColor() == color) {
 		int start = idx;
 		int end = idx;
@@ -121,49 +232,64 @@ LoopState Loop::handleCollision(COLOR color, int idx, int offset) {
 				else break;
 			}
 		}
-		if (end - start + offset + 1 >= 3) {
+		if (end - start + 1 >= 3) {
 			// erase
-			sphereString.erase(sphereString.begin() + start, sphereString.begin() + end + 1);
-			handlingLoopPointIdx = start;
-			if (handlingLoopPointIdx != 0 && handlingLoopPointIdx != sphereString.size()) {
-				if (willEraseAgain()) {
-					for (int i = 0; i < handlingLoopPointIdx; i++) {
-						sphereString[i].setVelocityOfIdx(-1);
-					}
-					for (int i = handlingLoopPointIdx; i < sphereString.size(); i++) {
-						sphereString[i].setVelocityOfIdx(0);
-					}
-				}
-				else {
-					for (int i = 0; i < handlingLoopPointIdx; i++) {
-						sphereString[i].setVelocityOfIdx(0);
-					}
-					for (int i = handlingLoopPointIdx; i < sphereString.size(); i++) {
-						sphereString[i].setVelocityOfIdx(1);
-					}
-				}
-			}
+			handleErase(start, end);
 			state = LoopState::ERASE;
 			return LoopState::ERASE;
 		}
 	}
-	
-	if (offset == 1) {
-		// insert
-		state = LoopState::INSERT;
-
-		return LoopState::INSERT;
+	state = LoopState::DEFAULT;
+	for (int i = 0; i < sphereString.size(); i++) {
+		sphereString[i].setVelocityOfIdx(1);
 	}
-	else {
-		state = LoopState::DEFAULT;
-		for (int i = 0; i < sphereString.size(); i++) {
-			sphereString[i].setVelocityOfIdx(1);
-		}
-		return LoopState::DEFAULT;
-	}
+	return LoopState::DEFAULT;
 }
 
 bool Loop::isSphereInserted(Sphere& sphere) {
+	if (handlingLoopPointIdx == sphereString.size() - 1) {
+		if (abs(getDistance(sphere.getCenter(), loopPoints[sphereString[handlingLoopPointIdx].getLoopPointIdx() - 50])) < 0.002) {
+			state = LoopState::DEFAULT;
+			sphereString.push_back(sphere);
+			int loopPointIdx = sphereString[sphereString.size() - 2].getLoopPointIdx();
+			sphereString[sphereString.size() - 1].setCenter(loopPoints[loopPointIdx - 50]);
+			sphereString[sphereString.size() - 1].setLoopPointIdx(loopPointIdx - 50);
+			for (int i = 0; i < sphereString.size(); i++) {
+				sphereString[i].setVelocityOfIdx(1);
+			}
+			return true;
+		}
+		else return false;
+	}
+
+	else if (loopPointIdxToCheckErasing != -1 && loopPointIdxToCheckErasing != sphereString.size()) {
+		if (getDistance(sphere.getCenter(), sphereString[loopPointIdxToCheckErasing].getCenter()) <= 50.0f) {
+			if (checkErase(sphere, loopPointIdxToCheckErasing)) {
+				state = LoopState::ERASE;
+				loopPointIdxToCheckErasing = -1;
+				return true;
+			}
+			else {
+				loopPointIdxToCheckErasing = -1;
+				return false;
+			}
+		}
+	}
+
+	else if (abs(getDistance(sphere.getCenter(), loopPoints[sphereString[handlingLoopPointIdx + 1].getLoopPointIdx() + 50]) < 0.001)) {
+		state = LoopState::DEFAULT;
+		sphereString.insert(sphereString.begin() + 1 + handlingLoopPointIdx, sphere);
+		for (int i = handlingLoopPointIdx + 1; i >= 0 ; i--) {
+			int loopPointIdx = sphereString[i + 1].getLoopPointIdx();
+			sphereString[i].setCenter(loopPoints[loopPointIdx + 50]);
+			sphereString[i].setLoopPointIdx(loopPointIdx + 50);
+		}
+		for (int i = 0; i < sphereString.size(); i++) {
+			sphereString[i].setVelocityOfIdx(1);
+		}
+		return true;
+	}
+
 	return false;
 }
 bool Loop::isEraseComplete() {

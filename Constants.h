@@ -11,5 +11,5 @@
 
 #define emptySpace 300.0f
 
-#define cannonBallScale 5.0f
-#define angleScale 3.0f
+#define cannonBallScale 8.0f
+#define angleScale 5.0f

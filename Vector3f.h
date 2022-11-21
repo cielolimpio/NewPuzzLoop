@@ -16,4 +16,6 @@ Vector3f operator+(const Vector3f& v1, const Vector3f& v2);
 Vector3f operator-(const Vector3f& v1, const Vector3f& v2);
 Vector3f operator*(const float s, const Vector3f& v);
 Vector3f operator/(const Vector3f& v, const float s);
+bool operator==(const Vector3f& v1, const Vector3f& v2);
 float dotProduct(const Vector3f& v1, const Vector3f& v2);
+float getDistance(const Vector3f& v1, const Vector3f& v2);

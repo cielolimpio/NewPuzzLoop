@@ -31,7 +31,7 @@ bool isCollisionDetected(const Sphere& sph1, const Sphere& sph2) {
 void handleCollision(Sphere& sphere, vector<Sphere>& sphereString) {
 	for (int i = 0; i < sphereString.size(); i++) {
 		if (isCollisionDetected(sphere, sphereString[i])) {
-			if (loop.handleCollision(sphere.getColor(), i, 1) == LoopState::ERASE)
+			if (loop.handleCollision(sphere, i) == LoopState::ERASE)
 				sphereExists = false;
 			return;
 		}
@@ -47,19 +47,22 @@ void idle() {
 	case LoopState::DEFAULT:
 	{
 		if ((float)(end_t - start_t) > 1000 / 40.0f) {
-			// handle collision between sphere and loop
-			vector<Sphere> sphereString = loop.getSphereString();
-			handleCollision(sphere, sphereString);
-
-			// when sphere goes out from window
-			float radius = sphere.getRadius();
-			const float centerX = sphere.getCenter()[0];
-			const float centerY = sphere.getCenter()[1];
-			if (centerX + radius <= -boundaryX || centerX - radius >= boundaryX ||
-				centerY + radius <= -boundaryY || centerY - radius >= boundaryY) {
-				cannon.setState(true);
+			if (sphereExists == true) {
+				float radius = sphere.getRadius();
+				const float centerX = sphere.getCenter()[0];
+				const float centerY = sphere.getCenter()[1];
+				if (centerX >= -boundaryX && centerX <= boundaryX &&
+					centerY >= -boundaryY && centerY <= boundaryY) {
+					// handle collision between sphere and loop
+					vector<Sphere> sphereString = loop.getSphereString();
+					handleCollision(sphere, sphereString);
+				}
+				// when sphere goes out from window
+				if (centerX + radius <= -boundaryX || centerX - radius >= boundaryX ||
+					centerY + radius <= -boundaryY || centerY - radius >= boundaryY) {
+					cannon.setState(true);
+				}
 			}
-
 			sphere.move();
 			loop.moveSphere();
 
@@ -69,10 +72,12 @@ void idle() {
 	}
 	case LoopState::INSERT:
 	{
-		if ((float)(end_t - start_t) > 1000 / 100.0f) {
-			if (loop.isSphereInserted(sphere))
+		if ((float)(end_t - start_t) > 1000 / 180.0f) {
+			if (loop.isSphereInserted(sphere)) {
+				sphereExists = false;
 				cannon.setState(true);
-
+			}
+				
 			sphere.move();
 			loop.moveSphere();
 
@@ -82,7 +87,7 @@ void idle() {
 	}
 	case LoopState::ERASE:
 	{
-		if ((float)(end_t - start_t) > 1000 / 100.0f) {
+		if ((float)(end_t - start_t) > 1000 / 180.0f) {
 			if (loop.isEraseComplete())
 				cannon.setState(true);
 			sphere.move();
