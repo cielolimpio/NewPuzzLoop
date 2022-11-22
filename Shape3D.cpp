@@ -29,20 +29,20 @@ void Shape3D::setMTL(const Material& m) {
 
 void Shape3D::setColor(COLOR color) {
 	mtl.setEmission(0.1f, 0.1f, 0.1f, 1.0f);
-	mtl.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
+	mtl.setDiffuse(0.07f, 0.07f, 0.07f, 1.0f);
 	mtl.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
-	mtl.setShininess(10.0f);
+	mtl.setShininess(20.0f);
 	switch (color) {
 	case COLOR::YELLOW:
-		mtl.setAmbient(0.4f, 0.4f, 0.1f, 1.0f);
+		mtl.setAmbient(0.8f, 0.1f, 0.1f, 1.0f);
 		this->color = COLOR::YELLOW;
 		break;
 	case COLOR::BLUE:
-		mtl.setAmbient(0.1f, 0.4f, 0.4f, 1.0f);
+		mtl.setAmbient(0.1f, 0.8f, 0.1f, 1.0f);
 		this->color = COLOR::BLUE;
 		break;
 	case COLOR::PURPLE:
-		mtl.setAmbient(0.4f, 0.1f, 0.4f, 1.0f);
+		mtl.setAmbient(0.1f, 0.1f, 0.8f, 1.0f);
 		this->color = COLOR::PURPLE;
 		break;
 	}
