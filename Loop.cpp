@@ -351,7 +351,7 @@ void Loop::draw() const {
 
 	// draw loop
 	glDisable(GL_LIGHTING);
-	glLineWidth(sphereString[0].getRadius() / 3);
+	glLineWidth(10.0f);
 	glBegin(GL_LINE_STRIP);
 	glColor3f(0.5f, 0.5f, 0.5f);
 	for (int i = 0; i < loopPoints.size(); i++)

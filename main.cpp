@@ -4,6 +4,7 @@
 #include "Loop.h"
 #include "Light.h"
 #include "Cannon.h"
+#include "Texture.h"
 
 Loop loop;
 Light light(boundaryX, boundaryY, boundaryX / 2, GL_LIGHT0);
@@ -11,15 +12,29 @@ Cannon cannon;
 Sphere sphere;
 bool sphereExists = false;
 
+Texture gameStart;
+Texture youWin;
+Texture gameOver;
+
+bool stateOfGame = false;
+bool stateOfWin = false;
+bool stateOfgameOver = false;
+
 clock_t start_t = clock();
 clock_t end_t;
 
 void initialize() {
+
 	light.setAmbient(0.5f, 0.5f, 0.5f, 1.0f);
 	light.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
 	light.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
 	loop.createLoop();
 	cannon.setSpheres();
+	gameStart.initializeTexture("gameStart.png");
+	youWin.initializeTexture("youWIn.png");
+	gameOver.initializeTexture("gameOver.png");
+
+
 }
 
 bool isCollisionDetected(const Sphere& sph1, const Sphere& sph2) {
@@ -41,99 +56,112 @@ void handleCollision(Sphere& sphere, vector<Sphere>& sphereString) {
 void idle() {
 	end_t = clock();
 
-	LoopState loopState = loop.getState();
+	if (stateOfGame && !stateOfWin && !stateOfgameOver) {
 
-	switch (loopState) {
-	case LoopState::START: {
-		if ((float)(end_t - start_t) > 1000 / 250.0f) {
-			if (loop.finishStarting()) {
-				cannon.setState(true);
-			}
-			else {
-				sphereExists = false;
-				cannon.setState(false);
-				loop.moveSphere();
-			}
-		}
-	}
-	case LoopState::DEFAULT:
-	{
-		if ((float)(end_t - start_t) > 1000 / 40.0f) {
-			if (sphereExists == true) {
-				float radius = sphere.getRadius();
-				const float centerX = sphere.getCenter()[0];
-				const float centerY = sphere.getCenter()[1];
-				if (centerX >= -boundaryX && centerX <= boundaryX &&
-					centerY >= -boundaryY && centerY <= boundaryY) {
-					// handle collision between sphere and loop
-					vector<Sphere> sphereString = loop.getSphereString();
-					handleCollision(sphere, sphereString);
-				}
-				// when sphere goes out from window
-				if (centerX + radius <= -boundaryX || centerX - radius >= boundaryX ||
-					centerY + radius <= -boundaryY || centerY - radius >= boundaryY) {
+		LoopState loopState = loop.getState();
+
+		switch (loopState) {
+		case LoopState::START: {
+			if ((float)(end_t - start_t) > 1000 / 250.0f) {
+				if (loop.finishStarting()) {
 					cannon.setState(true);
 				}
-			}
-			sphere.move();
-			loop.moveSphere();
-
-			start_t = end_t;
-		}
-		break;
-	}
-	case LoopState::INSERT:
-	{
-		if ((float)(end_t - start_t) > 1000 / 180.0f) {
-			if (loop.isSphereInserted(sphere)) {
-				if (loop.getState() == LoopState::ERASE) {
+				else {
+					sphereExists = false;
 					cannon.setState(false);
+					loop.moveSphere();
 				}
-				else {cannon.setState(true);}
-				
-				sphereExists = false;
 			}
-				
-			sphere.move();
-			loop.moveSphere();
-
-			start_t = end_t;
 		}
-		break;
-	}
-	case LoopState::ERASE:
-	{
-		if ((float)(end_t - start_t) > 1000 / 180.0f) {
-			if (loop.isEraseComplete())
-				cannon.setState(true);
-			sphere.move();
-			loop.moveSphere();
+		case LoopState::DEFAULT:
+		{
+			if ((float)(end_t - start_t) > 1000 / 40.0f) {
+				if (sphereExists == true) {
+					float radius = sphere.getRadius();
+					const float centerX = sphere.getCenter()[0];
+					const float centerY = sphere.getCenter()[1];
+					if (centerX >= -boundaryX && centerX <= boundaryX &&
+						centerY >= -boundaryY && centerY <= boundaryY) {
+						// handle collision between sphere and loop
+						vector<Sphere> sphereString = loop.getSphereString();
+						handleCollision(sphere, sphereString);
+					}
+					// when sphere goes out from window
+					if (centerX + radius <= -boundaryX || centerX - radius >= boundaryX ||
+						centerY + radius <= -boundaryY || centerY - radius >= boundaryY) {
+						cannon.setState(true);
+					}
+				}
+				sphere.move();
+				loop.moveSphere();
 
-			start_t = end_t;
+				start_t = end_t;
+			}
+			break;
 		}
-		break;
-	}
-	case LoopState::VICTORY:
-		// handle victory
-		return;
-	case LoopState::GAME_OVER:
-		// handle game_over
-		return;
-	}
+		case LoopState::INSERT:
+		{
+			if ((float)(end_t - start_t) > 1000 / 180.0f) {
+				if (loop.isSphereInserted(sphere)) {
+					if (loop.getState() == LoopState::ERASE) {
+						cannon.setState(false);
+					}
+					else { cannon.setState(true); }
 
-	glutPostRedisplay();
+					sphereExists = false;
+				}
+
+				sphere.move();
+				loop.moveSphere();
+
+				start_t = end_t;
+			}
+			break;
+		}
+		case LoopState::ERASE:
+		{
+			if ((float)(end_t - start_t) > 1000 / 180.0f) {
+				if (loop.isEraseComplete())
+					cannon.setState(true);
+				sphere.move();
+				loop.moveSphere();
+
+				start_t = end_t;
+			}
+			break;
+		}
+		case LoopState::VICTORY:
+			// handle victory
+			stateOfWin = true;
+			break;
+
+		case LoopState::GAME_OVER:
+			// handle game_over
+			stateOfgameOver = true;
+			break;
+		}
+		glutPostRedisplay();
+	}
 }
 
 void keyboardDown(unsigned char key, int x, int y) {
 	switch (key)
 	{
 	case ' ':
+		if (!stateOfGame) {
+			stateOfGame = true;
+		}
+
 		if (cannon.isPossible()) {
 			cannon.setState(false);
 			sphere = cannon.launchSpheres();
 			sphereExists = true;
 		}
 		break;
+
+
+	case 27:
+		exit(0);
 		
 	default:
 		break;
@@ -186,7 +214,7 @@ void specialKeyDown(int key, int x, int y) {
 			cannon.setAngle(ang);
 		}
 		break;
-
+	
 	default:
 		break;
 	}
@@ -202,27 +230,43 @@ void display() {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
-	// Draw 3D
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
-	glEnable(light.getLightID());
-
-	light.draw();
-
-	if (sphereExists)
-		sphere.draw();
-
 	glPushMatrix();
-	loop.draw();
-	glPopMatrix();
-	
-	cannon.draw();
+
+	if (!stateOfGame) {
+		gameStart.drawSquareWithTexture();
+	}
+
+	if (stateOfGame) {
+		// Draw 3D
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_LIGHTING);
+		glEnable(light.getLightID());
+
+		light.draw();
+
+		if (sphereExists)
+			sphere.draw();
+		glPushMatrix();
+		loop.draw();
+		glPopMatrix();
+
+		cannon.draw();
 
 
-	//glDisable(light.getLightID());
-	//glDisable(GL_LIGHTING);
-	glDisable(GL_DEPTH_TEST);
+		glDisable(light.getLightID());
+		glDisable(GL_LIGHTING);
+		glDisable(GL_DEPTH_TEST);
+	}
+
+	if (stateOfWin) {
+		glPopMatrix();
+		youWin.drawSquareWithTexture();
+	}
+
+	if (stateOfgameOver) {
+		glPopMatrix();
+		gameOver.drawSquareWithTexture();
+	}
 
 	glutSwapBuffers();
 }
@@ -233,7 +277,7 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowPosition(250, 70);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-	glutCreateWindow("Move spheres along the loop");
+	glutCreateWindow("PUZZ LOOP");
 	initialize();
 
 	// register callbacks
