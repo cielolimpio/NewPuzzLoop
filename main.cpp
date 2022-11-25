@@ -24,7 +24,7 @@ clock_t start_t = clock();
 clock_t end_t;
 
 void initialize() {
-
+	srand((unsigned int)time(NULL));
 	light.setAmbient(0.5f, 0.5f, 0.5f, 1.0f);
 	light.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
 	light.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);

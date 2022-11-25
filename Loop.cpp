@@ -17,13 +17,7 @@ vector<Sphere> Loop::getSphereString() {
 
 void Loop::addSphere(int numOfColor) {
 	if (numOfSpheres > 0) {
-		srand((unsigned int)time(NULL));
 		int colorNum = (int)rand() % numOfColor;
-		int n = sphereString.size() + 1;
-		while (n >= 0) {
-			colorNum = (int)rand() % numOfColor;
-			n--;
-		}
 		COLOR color = toColor(colorNum);
 		Sphere sphere(25, 30, 30);
 		sphere.setLoopPointIdx(0);
