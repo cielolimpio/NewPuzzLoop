@@ -13,6 +13,8 @@ class Loop
 public:
 	Loop();
 
+	int getScore();
+
 	vector<Sphere> getSphereString();
 
 	void addSphere(int numOfColor);
@@ -38,6 +40,8 @@ public:
 
 private:
 	LoopState state;
+
+	int score;
 
 	vector<Vector3f> loopPoints;
 	int startLoopPointIdx;

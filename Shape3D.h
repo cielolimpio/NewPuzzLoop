@@ -2,18 +2,18 @@
 #include "Vector3f.h"
 #include "Material.h"
 
-enum class COLOR { YELLOW, BLUE, PURPLE };
+enum class COLOR { RED, GREEN, BLUE };
 
 static COLOR toColor(int colorNum) {
 	int n = colorNum % 3;
 
 	switch (n) {
 	case 0:
-		return COLOR::YELLOW;
+		return COLOR::RED;
 	case 1:
-		return COLOR::BLUE;
+		return COLOR::GREEN;
 	case 2:
-		return COLOR::PURPLE;
+		return COLOR::BLUE;
 	}
 }
 

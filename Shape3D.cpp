@@ -33,17 +33,17 @@ void Shape3D::setColor(COLOR color) {
 	mtl.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
 	mtl.setShininess(20.0f);
 	switch (color) {
-	case COLOR::YELLOW:
+	case COLOR::RED:
 		mtl.setAmbient(0.8f, 0.1f, 0.1f, 1.0f);
-		this->color = COLOR::YELLOW;
+		this->color = COLOR::RED;
+		break;
+	case COLOR::GREEN:
+		mtl.setAmbient(0.1f, 0.8f, 0.1f, 1.0f);
+		this->color = COLOR::GREEN;
 		break;
 	case COLOR::BLUE:
-		mtl.setAmbient(0.1f, 0.8f, 0.1f, 1.0f);
-		this->color = COLOR::BLUE;
-		break;
-	case COLOR::PURPLE:
 		mtl.setAmbient(0.1f, 0.1f, 0.8f, 1.0f);
-		this->color = COLOR::PURPLE;
+		this->color = COLOR::BLUE;
 		break;
 	}
 }
