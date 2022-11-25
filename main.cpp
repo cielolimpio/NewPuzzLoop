@@ -20,13 +20,15 @@ bool stateOfGame = false;
 bool stateOfWin = false;
 bool stateOfgameOver = false;
 
+int score = 0;
+
 clock_t start_t = clock();
 clock_t end_t;
 
 void initialize() {
 	srand((unsigned int)time(NULL));
 	light.setAmbient(0.5f, 0.5f, 0.5f, 1.0f);
-	light.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
+	light.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f); 
 	light.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
 	loop.createLoop();
 	cannon.setSpheres();
@@ -35,6 +37,13 @@ void initialize() {
 	gameOver.initializeTexture("gameOver.png");
 
 
+}
+
+void displayCharacters(void* font, string str, float x, float y) {
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glRasterPos2f(x, y);
+	for (int i = 0; i < (int)str.size(); i++)
+		glutBitmapCharacter(font, str[i]);
 }
 
 bool isCollisionDetected(const Sphere& sph1, const Sphere& sph2) {
@@ -140,6 +149,9 @@ void idle() {
 			stateOfgameOver = true;
 			break;
 		}
+
+		score = loop.getScore();
+
 		glutPostRedisplay();
 	}
 }
@@ -237,6 +249,9 @@ void display() {
 	}
 
 	if (stateOfGame) {
+		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, "Score: ", boundaryX * 0.6f, boundaryY * 0.9f);
+		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, to_string(score), boundaryX * 0.6f+100, boundaryY * 0.9f);
+
 		// Draw 3D
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_LIGHTING);
@@ -259,14 +274,26 @@ void display() {
 	}
 
 	if (stateOfWin) {
+
 		glPopMatrix();
 		youWin.drawSquareWithTexture();
+		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, "The Final Score: ", -110, boundaryY * 0.5f);
+		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, to_string(score), 70, boundaryY * 0.5f);
+
 	}
 
-	if (stateOfgameOver) {
+	if (stateOfgameOver) 
+	{
 		glPopMatrix();
 		gameOver.drawSquareWithTexture();
+
+		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, "The Final Score: ", -110, boundaryY * 0.5f);
+		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, to_string(score), 70 , boundaryY * 0.5f);
+
+
 	}
+
+	cout << score << endl;
 
 	glutSwapBuffers();
 }

@@ -9,6 +9,12 @@ Loop::Loop() {
 	numOfSpheres = 20;
 
 	state = LoopState::START;
+	
+	score = 0;
+}
+
+int Loop::getScore() {
+	return score;
 }
 
 vector<Sphere> Loop::getSphereString() {
@@ -142,6 +148,8 @@ bool Loop::willEraseAgain() {
 
 void Loop::handleErase(int start, int end) {
 	sphereString.erase(sphereString.begin() + start, sphereString.begin() + end + 1);
+
+	score += end - start + 1;
 
 	if (sphereString.empty()) {
 		state = LoopState::VICTORY;
