@@ -24,7 +24,7 @@ public:
 	bool finishStarting();
 
 	bool checkErase(Sphere& sphere, int idx);
-	bool willEraseAgain();
+	bool haveToGoBack();
 	void handleErase(int start, int end);
 	void handleInsert(Sphere& sphere, int idx);
 

@@ -135,7 +135,7 @@ bool Loop::checkErase(Sphere& sphere, int idx) {
 	return false;
 }
 
-bool Loop::willEraseAgain() {
+bool Loop::haveToGoBack() {
 	COLOR color = sphereString[handlingLoopPointIdx].getColor();
 	int start = handlingLoopPointIdx;
 	int end = handlingLoopPointIdx;
@@ -155,7 +155,7 @@ bool Loop::willEraseAgain() {
 		}
 	}
 
-	if (end - start + 1 >= 3) return true;
+	if (end - start + 1 >= 2) return true;
 	else return false;
 }
 
@@ -171,7 +171,7 @@ void Loop::handleErase(int start, int end) {
 
 	handlingLoopPointIdx = start;
 	if (handlingLoopPointIdx != 0 && handlingLoopPointIdx != sphereString.size()) {
-		if (willEraseAgain()) {
+		if (haveToGoBack()) {
 			for (int i = 0; i < handlingLoopPointIdx; i++) {
 				sphereString[i].setVelocityOfIdx(-1);
 			}
