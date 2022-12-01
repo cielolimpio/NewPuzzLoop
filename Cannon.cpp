@@ -101,8 +101,6 @@ Sphere Cannon::launchSpheres() {
 
 
 void Cannon::draw() {
-
-
 	glTranslatef(pos[0], pos[1], pos[2]);
 
 	glPushMatrix();
@@ -112,15 +110,20 @@ void Cannon::draw() {
 
 
 	glColor3f(0.0f, 0.0f, 0.0f);
+	glBegin(GL_QUADS);
+	glVertex2f(20.0f + pos[0], 85.0f + pos[1]);
+	glVertex2f(20.0f + pos[0], -15.0f + pos[1]);
+	glVertex2f(-20.0f + pos[0], -15.0f + pos[1]);
+	glVertex2f(-20.0f + pos[0], 85.0f + pos[1]);
+	glEnd();
 
-
+	glColor3f(0.7f, 0.7f, 0.7f);
 	glBegin(GL_QUADS);
 	glVertex2f(-30.0f + pos[0], -25.0f + pos[1]);
 	glVertex2f(30.0f + pos[0], -25.0f + pos[1]);
 	glVertex2f(30.0f + pos[0], 85.0f + pos[1]);
 	glVertex2f(-30.0f + pos[0], 85.0f + pos[1]);
 	glEnd();
-	
 	
 	glPopMatrix();
 	glColor3f(0.3, 0.3, 0.3);
