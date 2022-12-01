@@ -51,9 +51,8 @@ void Sphere::draw() const {
 	glTranslatef(center[0], center[1], center[2]);
 
 	glutSolidSphere(radius, slice, stack);
-	
-	glPopMatrix();
 
+	glPopMatrix();
 }
 
 

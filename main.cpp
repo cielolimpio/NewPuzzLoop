@@ -51,7 +51,7 @@ bool isCollisionDetected(const Sphere& sph1, const Sphere& sph2) {
 void handleCollision(Sphere& sphere, vector<Sphere>& sphereString) {
 	for (int i = 0; i < sphereString.size(); i++) {
 		if (isCollisionDetected(sphere, sphereString[i])) {
-			if (loop.handleCollision(sphere, i) == LoopState::ERASE)
+			if (loop.handleCollision(sphere, i) == LoopState::ERASING)
 				sphereExists = false;
 			return;
 		}
@@ -64,10 +64,12 @@ void idle() {
 	LoopState loopState = loop.getState();
 
 	switch (loopState) {
-	case LoopState::START: {
+	case LoopState::START: 
+	{
 		break;
 	}
-	case LoopState::BEGIN: {
+	case LoopState::BEGIN: 
+	{
 		if ((float)(end_t - start_t) > 1000 / 250.0f) {
 			if (loop.finishStarting()) {
 				cannon.setState(true);
@@ -110,7 +112,7 @@ void idle() {
 	{
 		if ((float)(end_t - start_t) > 1000 / 180.0f) {
 			if (loop.isSphereInserted(sphere)) {
-				if (loop.getState() == LoopState::ERASE) {
+				if (loop.getState() == LoopState::ERASING) {
 					cannon.setState(false);
 				}
 				else { cannon.setState(true); }
@@ -125,10 +127,18 @@ void idle() {
 		}
 		break;
 	}
+	case LoopState::ERASING:
+	{
+		if ((float)(end_t - start_t) > 1000 / 1500.0f) {
+			if (loop.isErasingComplete()) {
+			}
+			start_t = end_t;
+		}
+	}
 	case LoopState::ERASE:
 	{
 		if ((float)(end_t - start_t) > 1000 / 180.0f) {
-			if (loop.isEraseComplete())
+ 			if (loop.isEraseComplete())
 				cannon.setState(true);
 			sphere.move();
 			loop.moveSphere();

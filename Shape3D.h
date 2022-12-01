@@ -25,14 +25,20 @@ public:
 	Vector3f getCenter() const;
 	void setVelocity(const Vector3f& v);
 	Vector3f getVelocity() const;
+	void setMtlVelocity(Vector4f mtlVelocity);
+	Vector4f getMtlVelocity() const;
 	void move();
+	Material getMTL();
 	void setMTL(const Material& m);
+	void setAmbient(Vector4f ambient);
 	void setColor(COLOR color);
 	COLOR getColor() const;
 	virtual void draw() const = 0;
 
 protected:
 	COLOR color;
+
+	Vector4f mtlVelocity;
 
 	Vector3f center;
 	Vector3f velocity;

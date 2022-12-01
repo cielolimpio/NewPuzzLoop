@@ -17,7 +17,16 @@ void Shape3D::setVelocity(const Vector3f& v) {
 
 Vector3f Shape3D::getVelocity() const { return velocity; }
 
+void Shape3D::setMtlVelocity(Vector4f mtlVelocity) {
+	this->mtlVelocity = mtlVelocity;
+}
+Vector4f Shape3D::getMtlVelocity() const {
+	return mtlVelocity;
+}
 
+Material Shape3D::getMTL() {
+	return mtl;
+}
 
 void Shape3D::setMTL(const Material& m) {
 	mtl.setEmission(m.getEmission()[0], m.getEmission()[1], m.getEmission()[2], m.getEmission()[3]);
@@ -25,6 +34,10 @@ void Shape3D::setMTL(const Material& m) {
 	mtl.setDiffuse(m.getDiffuse()[0], m.getDiffuse()[1], m.getDiffuse()[2], m.getDiffuse()[3]);
 	mtl.setSpecular(m.getSpecular()[0], m.getSpecular()[1], m.getSpecular()[2], m.getSpecular()[3]);
 	mtl.setShininess(m.getShininess());
+}
+
+void Shape3D::setAmbient(Vector4f ambient) {
+	mtl.setAmbient(ambient[0], ambient[1], ambient[2], ambient[3]);
 }
 
 void Shape3D::setColor(COLOR color) {
