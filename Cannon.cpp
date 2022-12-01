@@ -11,6 +11,7 @@ Cannon::Cannon() {
 	posOfSphere2 = pos;
 	posOfSphere1 = { posOfSphere2[0], posOfSphere2[1]+50, posOfSphere2[2] };
 	isPossibleToLaunch = false;
+
 }
 
 void Cannon::clear() {
@@ -100,21 +101,43 @@ Sphere Cannon::launchSpheres() {
 
 
 void Cannon::draw() {
-	
+
+
 	glTranslatef(pos[0], pos[1], pos[2]);
+
+	glPushMatrix();
+	
 	glRotatef(angle-90, 0.0f, 0.0f, 1.0f);
 	glTranslatef(-pos[0], -pos[1], -pos[2]);
 
 
-	glColor3f(1.0f, 1.0f, 1.0f);
+	glColor3f(0.0f, 0.0f, 0.0f);
+
 
 	glBegin(GL_QUADS);
-	glVertex2f(-30.0f + pos[0], -60.0f + pos[1]);
-	glVertex2f(30.0f + pos[0], -60.0f + pos[1]);
-	glVertex2f(30.0f + pos[0], 60.0f + pos[1]);
-	glVertex2f(-30.0f + pos[0], 60.0f + pos[1]);
+	glVertex2f(-30.0f + pos[0], -25.0f + pos[1]);
+	glVertex2f(30.0f + pos[0], -25.0f + pos[1]);
+	glVertex2f(30.0f + pos[0], 85.0f + pos[1]);
+	glVertex2f(-30.0f + pos[0], 85.0f + pos[1]);
 	glEnd();
 	
+	
+	glPopMatrix();
+	glColor3f(0.3, 0.3, 0.3);
+	
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < 360; i++)
+	{
+		float angle = i * 3.141592 / 180;
+		glVertex2f(cos(angle) * 80, sin(angle) * 80);
+	}
+	glEnd();
+	
+
+	glRotatef(angle - 90, 0.0f, 0.0f, 1.0f);
+	glTranslatef(-pos[0], -pos[1], -pos[2]);
+
+
 	glEnable(GL_LIGHTING);
 	cannonBall[0].draw();
 	cannonBall[1].draw();
