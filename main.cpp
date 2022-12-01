@@ -16,10 +16,6 @@ Texture gameStart;
 Texture youWin;
 Texture gameOver;
 
-bool stateOfGame = false;
-bool stateOfWin = false;
-bool stateOfgameOver = false;
-
 int score = 0;
 
 clock_t start_t = clock();
@@ -65,116 +61,119 @@ void handleCollision(Sphere& sphere, vector<Sphere>& sphereString) {
 void idle() {
 	end_t = clock();
 
-	if (stateOfGame && !stateOfWin && !stateOfgameOver) {
+	LoopState loopState = loop.getState();
 
-		LoopState loopState = loop.getState();
-
-		switch (loopState) {
-		case LoopState::START: {
-			if ((float)(end_t - start_t) > 1000 / 250.0f) {
-				if (loop.finishStarting()) {
-					cannon.setState(true);
-				}
-				else {
-					sphereExists = false;
-					cannon.setState(false);
-					loop.moveSphere();
-				}
-			}
-		}
-		case LoopState::DEFAULT:
-		{
-			if ((float)(end_t - start_t) > 1000 / 40.0f) {
-				if (sphereExists == true) {
-					float radius = sphere.getRadius();
-					const float centerX = sphere.getCenter()[0];
-					const float centerY = sphere.getCenter()[1];
-					if (centerX >= -boundaryX && centerX <= boundaryX &&
-						centerY >= -boundaryY && centerY <= boundaryY) {
-						// handle collision between sphere and loop
-						vector<Sphere> sphereString = loop.getSphereString();
-						handleCollision(sphere, sphereString);
-					}
-					// when sphere goes out from window
-					if (centerX + radius <= -boundaryX || centerX - radius >= boundaryX ||
-						centerY + radius <= -boundaryY || centerY - radius >= boundaryY) {
-						cannon.setState(true);
-					}
-				}
-				sphere.move();
-				loop.moveSphere();
-
-				start_t = end_t;
-			}
-			break;
-		}
-		case LoopState::INSERT:
-		{
-			if ((float)(end_t - start_t) > 1000 / 180.0f) {
-				if (loop.isSphereInserted(sphere)) {
-					if (loop.getState() == LoopState::ERASE) {
-						cannon.setState(false);
-					}
-					else { cannon.setState(true); }
-
-					sphereExists = false;
-				}
-
-				sphere.move();
-				loop.moveSphere();
-
-				start_t = end_t;
-			}
-			break;
-		}
-		case LoopState::ERASE:
-		{
-			if ((float)(end_t - start_t) > 1000 / 180.0f) {
-				if (loop.isEraseComplete())
-					cannon.setState(true);
-				sphere.move();
-				loop.moveSphere();
-
-				start_t = end_t;
-			}
-			break;
-		}
-		case LoopState::VICTORY:
-			// handle victory
-			stateOfWin = true;
-			break;
-
-		case LoopState::GAME_OVER:
-			// handle game_over
-			stateOfgameOver = true;
-			break;
-		}
-
-		score = loop.getScore();
-
-		glutPostRedisplay();
+	switch (loopState) {
+	case LoopState::START: {
+		break;
 	}
+	case LoopState::BEGIN: {
+		if ((float)(end_t - start_t) > 1000 / 250.0f) {
+			if (loop.finishStarting()) {
+				cannon.setState(true);
+			}
+			else {
+				sphereExists = false;
+				cannon.setState(false);
+				loop.moveSphere();
+			}
+		}
+		break;
+	}
+	case LoopState::DEFAULT:
+	{
+		if ((float)(end_t - start_t) > 1000 / 40.0f) {
+			if (sphereExists == true) {
+				float radius = sphere.getRadius();
+				const float centerX = sphere.getCenter()[0];
+				const float centerY = sphere.getCenter()[1];
+				if (centerX >= -boundaryX && centerX <= boundaryX &&
+					centerY >= -boundaryY && centerY <= boundaryY) {
+					// handle collision between sphere and loop
+					vector<Sphere> sphereString = loop.getSphereString();
+					handleCollision(sphere, sphereString);
+				}
+				// when sphere goes out from window
+				if (centerX + radius <= -boundaryX || centerX - radius >= boundaryX ||
+					centerY + radius <= -boundaryY || centerY - radius >= boundaryY) {
+					cannon.setState(true);
+				}
+			}
+			sphere.move();
+			loop.moveSphere();
+
+			start_t = end_t;
+		}
+		break;
+	}
+	case LoopState::INSERT:
+	{
+		if ((float)(end_t - start_t) > 1000 / 180.0f) {
+			if (loop.isSphereInserted(sphere)) {
+				if (loop.getState() == LoopState::ERASE) {
+					cannon.setState(false);
+				}
+				else { cannon.setState(true); }
+
+				sphereExists = false;
+			}
+
+			sphere.move();
+			loop.moveSphere();
+
+			start_t = end_t;
+		}
+		break;
+	}
+	case LoopState::ERASE:
+	{
+		if ((float)(end_t - start_t) > 1000 / 180.0f) {
+			if (loop.isEraseComplete())
+				cannon.setState(true);
+			sphere.move();
+			loop.moveSphere();
+
+			start_t = end_t;
+		}
+		break;
+	}
+	case LoopState::VICTORY:
+		// handle victory
+		break;
+
+	case LoopState::GAME_OVER:
+		// handle game_over
+		break;
+	}
+
+	score = loop.getScore();
+
+	glutPostRedisplay();
 }
 
 void keyboardDown(unsigned char key, int x, int y) {
 	switch (key)
 	{
 	case ' ':
-		if (!stateOfGame) {
-			stateOfGame = true;
+		if (loop.getState() == LoopState::START) {
+			loop.setState(LoopState::BEGIN);
 		}
 
-		if (cannon.isPossible()) {
+		else if (cannon.isPossible()) {
 			cannon.setState(false);
 			sphere = cannon.launchSpheres();
 			sphereExists = true;
 		}
 		break;
 
-
 	case 27:
 		exit(0);
-		
+	case 'a':
+		if (loop.getState() == LoopState::VICTORY || loop.getState() == LoopState::GAME_OVER) {
+			loop.clear();
+			cannon.clear();
+			sphereExists = false;
+		}
 	default:
 		break;
 	}
@@ -191,6 +190,7 @@ void specialKeyDown(int key, int x, int y) {
 		else if (cannon.getDirection()[1] < 0) {
 			float ang = cannon.getAngle() - angleScale;
 			cannon.setAngle(ang);
+			score = 0;
 		}
 		break;
 
@@ -244,13 +244,29 @@ void display() {
 	glLoadIdentity();
 	glPushMatrix();
 
-	if (!stateOfGame) {
+	if (loop.getState() == LoopState::START) {
 		gameStart.drawSquareWithTexture();
 	}
+	else if (loop.getState() == LoopState::VICTORY) {
 
-	if (stateOfGame) {
+		glPopMatrix();
+		youWin.drawSquareWithTexture();
+		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, "The Final Score: ", -110, boundaryY * 0.5f);
+		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, to_string(score), 70, boundaryY * 0.5f);
+
+	}
+
+	else if (loop.getState() == LoopState::GAME_OVER)
+	{
+		glPopMatrix();
+		gameOver.drawSquareWithTexture();
+
+		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, "The Final Score: ", -110, boundaryY * 0.5f);
+		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, to_string(score), 70, boundaryY * 0.5f);
+	}
+	else {
 		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, "Score: ", boundaryX * 0.6f, boundaryY * 0.9f);
-		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, to_string(score), boundaryX * 0.6f+100, boundaryY * 0.9f);
+		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, to_string(score), boundaryX * 0.6f + 100, boundaryY * 0.9f);
 
 		// Draw 3D
 		glEnable(GL_DEPTH_TEST);
@@ -272,28 +288,6 @@ void display() {
 		glDisable(GL_LIGHTING);
 		glDisable(GL_DEPTH_TEST);
 	}
-
-	if (stateOfWin) {
-
-		glPopMatrix();
-		youWin.drawSquareWithTexture();
-		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, "The Final Score: ", -110, boundaryY * 0.5f);
-		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, to_string(score), 70, boundaryY * 0.5f);
-
-	}
-
-	if (stateOfgameOver) 
-	{
-		glPopMatrix();
-		gameOver.drawSquareWithTexture();
-
-		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, "The Final Score: ", -110, boundaryY * 0.5f);
-		displayCharacters(GLUT_BITMAP_TIMES_ROMAN_24, to_string(score), 70 , boundaryY * 0.5f);
-
-
-	}
-
-	cout << score << endl;
 
 	glutSwapBuffers();
 }

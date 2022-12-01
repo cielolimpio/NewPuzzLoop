@@ -6,12 +6,13 @@ using namespace std;
 #include "Constants.h"
 #include "Sphere.h"
 
-enum class LoopState { DEFAULT, START, INSERT, ERASE, VICTORY, GAME_OVER };
+enum class LoopState { DEFAULT, START, BEGIN, INSERT, ERASE, VICTORY, GAME_OVER };
 
 class Loop
 {
 public:
 	Loop();
+	void clear();
 
 	int getScore();
 
@@ -35,6 +36,7 @@ public:
 
 	void moveSphere();
 	LoopState getState();
+	void setState(LoopState state);
 
 	void draw() const;
 

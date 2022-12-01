@@ -11,7 +11,7 @@ using namespace std;
 class Cannon {
 public:
 	Cannon();
-	//void rotate(int key);
+	void clear();
 	COLOR setSphereColor(int numOfColor);
 	void setSpheres();
 	void draw();

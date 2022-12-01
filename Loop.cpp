@@ -13,6 +13,19 @@ Loop::Loop() {
 	score = 0;
 }
 
+void Loop::clear() {
+	loopPoints.clear();
+	startLoopPointIdx = endLoopPointIdx = 0;
+
+	sphereString.clear();
+	numOfSpheres = 20;
+
+	state = LoopState::BEGIN;
+
+	score = 0;
+	createLoop();
+}
+
 int Loop::getScore() {
 	return score;
 }
@@ -341,6 +354,10 @@ LoopState Loop::getState() {
 		state = LoopState::GAME_OVER;
 	}
 	return state;
+}
+
+void Loop::setState(LoopState state) {
+	this->state = state;
 }
 
 void Loop::draw() const {

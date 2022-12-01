@@ -13,6 +13,19 @@ Cannon::Cannon() {
 	isPossibleToLaunch = false;
 }
 
+void Cannon::clear() {
+	angle = 0.0f;
+	direction[0] = cos(angle * 3.141592 / 180);
+	direction[1] = sin(angle * 3.141592 / 180);
+	pos[0] = -150.0f;
+	pos[1] = 0.0f;
+	pos[2] = 0.0f;
+	posOfSphere2 = pos;
+	posOfSphere1 = { posOfSphere2[0], posOfSphere2[1] + 50, posOfSphere2[2] };
+	isPossibleToLaunch = false;
+	setSpheres();
+}
+
 void Cannon::setAngle(float ang) {
 
 	angle = ang;
@@ -51,8 +64,6 @@ void Cannon::setSpheres() {
 	sphere2.setColor(setSphereColor(3));
 	sphere2.setCenter(posOfSphere2);
 	cannonBall.push_back(sphere2);
-
-	
 }
 
 void Cannon::setState(bool state) {
