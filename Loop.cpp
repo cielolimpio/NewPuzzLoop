@@ -315,7 +315,7 @@ bool Loop::isSphereInserted(Sphere& sphere) {
 	else if (loopPointIdxToCheckErasing != -1 && loopPointIdxToCheckErasing != sphereString.size()) {
 		if (getDistance(sphere.getCenter(), sphereString[loopPointIdxToCheckErasing].getCenter()) <= 50.0f) {
 			if (checkErase(sphere, loopPointIdxToCheckErasing)) {
-				state = LoopState::ERASE;
+				state = LoopState::ERASING;
 				loopPointIdxToCheckErasing = -1;
 				return true;
 			}

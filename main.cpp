@@ -129,7 +129,7 @@ void idle() {
 	}
 	case LoopState::ERASING:
 	{
-		if ((float)(end_t - start_t) > 1000 / 1500.0f) {
+		if ((float)(end_t - start_t) > 1.0f) {
 			if (loop.isErasingComplete()) {
 			}
 			start_t = end_t;
