@@ -11,6 +11,7 @@ Loop::Loop() {
 	state = LoopState::START;
 	
 	score = 0;
+	scoreScale = 1;
 }
 
 void Loop::clear() {
@@ -23,6 +24,7 @@ void Loop::clear() {
 	state = LoopState::BEGIN;
 
 	score = 0;
+	scoreScale = 1;
 	createLoop();
 }
 
@@ -129,6 +131,23 @@ bool Loop::checkErase(Sphere& sphere, int idx) {
 		if (end - start + 2 >= 3) {
 			// erase
 			handleErasing(start, end);
+
+			Material mtl;
+			mtl.setEmission(0.0f, 0.0f, 0.0f, 0.0f);
+			mtl.setDiffuse(0.0f, 0.0f, 0.0f, 0.0f);
+			mtl.setSpecular(0.0f, 0.0f, 0.0f, 0.0f);
+			mtl.setShininess(20.0f);
+			Vector4f originalAmbient = sphere.getMTL().getAmbient();
+			Vector4f mtlVelocity;
+			for (int j = 0; j < 4; j++) {
+				mtlVelocity[j] = (0.0f - originalAmbient[j]) / 200.0f;
+			}
+			Vector4f newAmbient = originalAmbient + mtlVelocity;
+			mtl.setAmbient(newAmbient[0], newAmbient[1], newAmbient[2], newAmbient[3]);
+			sphere.setMtlVelocity(mtlVelocity);
+			sphere.setMTL(mtl);
+
+			sphere.setVelocity(Vector3f(0.0f, 0.0f, 0.0f));
 			return true;
 		}
 	}
@@ -167,8 +186,6 @@ void Loop::handleErasing(int start, int end) {
 
 void Loop::handleErase() {
 	sphereString.erase(sphereString.begin() + erasingSphereStartIndex, sphereString.begin() + erasingSphereEndIndex + 1);
-
-	score += erasingSphereEndIndex - erasingSphereStartIndex + 1;
 
 	if (sphereString.empty()) {
 		state = LoopState::VICTORY;
@@ -235,6 +252,8 @@ void Loop::handleInsert(Sphere& sphere, int idx) {
 
 LoopState Loop::handleCollision(Sphere& sphere, int idx) {
 	if (checkErase(sphere, idx)) {
+		score += 30;
+		scoreScale++;
 		state = LoopState::ERASING;
 		return LoopState::ERASING;
 	}
@@ -266,6 +285,8 @@ LoopState Loop::handleCollision(COLOR color, int idx) {
 		}
 		if (end - start + 1 >= 3) {
 			// erase
+			score += (end - start + 1) * 10 * scoreScale;
+			scoreScale++;
 			handleErasing(start, end);
 			state = LoopState::ERASING;
 			return LoopState::ERASING;
@@ -297,6 +318,8 @@ bool Loop::isSphereInserted(Sphere& sphere) {
 	else if (loopPointIdxToCheckErasing != -1 && loopPointIdxToCheckErasing != sphereString.size()) {
 		if (getDistance(sphere.getCenter(), sphereString[loopPointIdxToCheckErasing].getCenter()) <= 50.0f) {
 			if (checkErase(sphere, loopPointIdxToCheckErasing)) {
+				score += 30;
+				scoreScale++;
 				state = LoopState::ERASING;
 				loopPointIdxToCheckErasing = -1;
 				return true;
@@ -308,7 +331,7 @@ bool Loop::isSphereInserted(Sphere& sphere) {
 		}
 	}
 
-	else if (getDistance(sphere.getCenter(), loopPoints[sphereString[handlingLoopPointIdx + 1].getLoopPointIdx() + 50]) < 1) {
+	else if (getDistance(sphere.getCenter(), loopPoints[sphereString[handlingLoopPointIdx + 1].getLoopPointIdx() + 50]) < 4) {
 		state = LoopState::DEFAULT;
 		sphereString.insert(sphereString.begin() + 1 + handlingLoopPointIdx, sphere);
 		for (int i = handlingLoopPointIdx + 1; i >= 0 ; i--) {
@@ -326,10 +349,10 @@ bool Loop::isSphereInserted(Sphere& sphere) {
 }
 
 bool Loop::isErasingComplete() {
-	if (sphereString[erasingSphereStartIndex].getMTL().getAmbient()[0] <= 0.0001) {
+	if (sphereString[erasingSphereStartIndex].getMTL().getAmbient()[0] <= 0.01) {
 		state = LoopState::ERASE;
 		handleErase();
-		return false;
+		return true;
 	}
 	else {
 		for (int i = erasingSphereStartIndex; i <= erasingSphereEndIndex; i++) {
@@ -338,12 +361,13 @@ bool Loop::isErasingComplete() {
 			Vector4f newAmbient = originalAmbient + mtlVelocity;
 			sphereString[i].setAmbient(newAmbient);
 		}
-		return true;
+		return false;
 	}
 }
 
 bool Loop::isEraseComplete() {
 	if (handlingLoopPointIdx == sphereString.size() || handlingLoopPointIdx == 0) {
+		scoreScale = 1;
 		state = LoopState::DEFAULT;
 		for (int i = 0; i < sphereString.size(); i++) {
 			sphereString[i].setVelocityOfIdx(1);
@@ -353,7 +377,10 @@ bool Loop::isEraseComplete() {
 	else if (sphereString[handlingLoopPointIdx - 1].getLoopPointIdx() - sphereString[handlingLoopPointIdx].getLoopPointIdx() == 50) {
 		LoopState state = handleCollision(sphereString[handlingLoopPointIdx].getColor(), handlingLoopPointIdx);
 		if (state == LoopState::ERASING) return false;
-		else return true;
+		else {
+			scoreScale = 1;
+			return true;
+		}
 	}
 	else return false;
 }

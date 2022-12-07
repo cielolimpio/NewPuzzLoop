@@ -46,6 +46,7 @@ private:
 	LoopState state;
 
 	int score;
+	float scoreScale;
 
 	vector<Vector3f> loopPoints;
 	int startLoopPointIdx;

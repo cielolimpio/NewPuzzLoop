@@ -52,7 +52,7 @@ void handleCollision(Sphere& sphere, vector<Sphere>& sphereString) {
 	for (int i = 0; i < sphereString.size(); i++) {
 		if (isCollisionDetected(sphere, sphereString[i])) {
 			if (loop.handleCollision(sphere, i) == LoopState::ERASING)
-				sphereExists = false;
+				/*sphereExists = false;*/
 			return;
 		}
 	}
@@ -70,7 +70,7 @@ void idle() {
 	}
 	case LoopState::BEGIN: 
 	{
-		if ((float)(end_t - start_t) > 1000 / 250.0f) {
+		if ((float)(end_t - start_t) > 0) {
 			if (loop.finishStarting()) {
 				cannon.setState(true);
 			}
@@ -79,6 +79,7 @@ void idle() {
 				cannon.setState(false);
 				loop.moveSphere();
 			}
+			start_t = end_t;
 		}
 		break;
 	}
@@ -129,11 +130,21 @@ void idle() {
 	}
 	case LoopState::ERASING:
 	{
-		if ((float)(end_t - start_t) > 1.0f) {
+		if ((float)(end_t - start_t) > 1.5f) {
 			if (loop.isErasingComplete()) {
+				sphereExists = false;
 			}
+			else {
+				Vector4f mtlVelocity = sphere.getMtlVelocity();
+				Vector4f originalAmbient = sphere.getMTL().getAmbient();
+				Vector4f newAmbient = originalAmbient + mtlVelocity;
+				sphere.setAmbient(newAmbient);
+			}
+			sphere.move();
+			loop.moveSphere();
 			start_t = end_t;
 		}
+		break;
 	}
 	case LoopState::ERASE:
 	{
