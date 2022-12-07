@@ -136,26 +136,8 @@ bool Loop::checkErase(Sphere& sphere, int idx) {
 }
 
 bool Loop::haveToGoBack() {
-	COLOR color = sphereString[handlingLoopPointIdx].getColor();
-	int start = handlingLoopPointIdx;
-	int end = handlingLoopPointIdx;
-
-	if (sphereString[start].getColor() == color) {
-		while (start > 0) {
-			if (sphereString[start - 1].getColor() == color)
-				start--;
-			else break;
-		}
-	}
-	if (sphereString[end].getColor() == color) {
-		while (end < sphereString.size() - 1) {
-			if (sphereString[end + 1].getColor() == color)
-				end++;
-			else break;
-		}
-	}
-
-	if (end - start + 1 >= 2) return true;
+	if (sphereString[handlingLoopPointIdx].getColor() == sphereString[handlingLoopPointIdx - 1].getColor())
+		return true;
 	else return false;
 }
 
@@ -298,7 +280,7 @@ LoopState Loop::handleCollision(COLOR color, int idx) {
 
 bool Loop::isSphereInserted(Sphere& sphere) {
 	if (handlingLoopPointIdx == sphereString.size() - 1) {
-		if (abs(getDistance(sphere.getCenter(), loopPoints[sphereString[handlingLoopPointIdx].getLoopPointIdx() - 50])) < 0.002) {
+		if (getDistance(sphere.getCenter(), loopPoints[sphereString[handlingLoopPointIdx].getLoopPointIdx() - 50]) < 1) {
 			state = LoopState::DEFAULT;
 			sphereString.push_back(sphere);
 			int loopPointIdx = sphereString[sphereString.size() - 2].getLoopPointIdx();
@@ -326,7 +308,7 @@ bool Loop::isSphereInserted(Sphere& sphere) {
 		}
 	}
 
-	else if (abs(getDistance(sphere.getCenter(), loopPoints[sphereString[handlingLoopPointIdx + 1].getLoopPointIdx() + 50]) < 0.001)) {
+	else if (getDistance(sphere.getCenter(), loopPoints[sphereString[handlingLoopPointIdx + 1].getLoopPointIdx() + 50]) < 1) {
 		state = LoopState::DEFAULT;
 		sphereString.insert(sphereString.begin() + 1 + handlingLoopPointIdx, sphere);
 		for (int i = handlingLoopPointIdx + 1; i >= 0 ; i--) {
